@@ -1,6 +1,6 @@
 <template>
   <header class="print-hide">
-    <q-btn flat icon="menu" color="dark" padding="none" class="q-mr-md">
+    <!-- <q-btn flat icon="menu" color="dark" padding="none" class="q-mr-md">
       <q-menu>
         <q-list style="min-width: 100px" dense>
           <q-item
@@ -31,7 +31,7 @@
           </q-item>
         </q-list>
       </q-menu>
-    </q-btn>
+    </q-btn> -->
     <span class="">
       <span class="text-dark text-bold">Coastal Resilience</span>
       <span class="text-bold text-subtitle1"> Mangrove Explorer</span>
