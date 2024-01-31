@@ -40,7 +40,10 @@ export default {
   },
   data() {
     return {
-      active: true
+      active: true,
+      previousMangroveLayer: 6,
+      previousClimaticLayer: '',
+      intensity: ''
     }
   },
   computed: {
@@ -68,36 +71,44 @@ export default {
         this.$store.commit('updateLayerOption', value)
       }
     },
-    presenceOpacity: {
+    layerSelection: {
       get() {
-        return this.$store.state.presenceOpacity
+        return this.$store.state.layerSelection
       },
       set(value) {
-        this.$store.commit('updatePresenceOpacity', value)
+        this.$store.commit('updateLayerSelection', value)
       }
     },
-    abundanceOpacity: {
+    climaticSelection: {
       get() {
-        return this.$store.state.abundanceOpacity
+        return this.$store.state.climaticSelection
       },
       set(value) {
-        this.$store.commit('updateAbundanceOpacity', value)
+        this.$store.commit('updateClimaticSelection', value)
       }
     },
-    tempOpacity: {
+    supportingSelection: {
       get() {
-        return this.$store.state.tempOpacity
+        return this.$store.state.supportingSelection
       },
       set(value) {
-        this.$store.commit('updateTempOpacity', value)
+        this.$store.commit('updateSupportingSelection', value)
       }
     },
-    precipOpacity: {
+    socialSelection: {
       get() {
-        return this.$store.state.precipOpacity
+        return this.$store.state.socialSelection
       },
       set(value) {
-        this.$store.commit('updatePrecipOpacity', value)
+        this.$store.commit('updateSocialSelection', value)
+      }
+    },
+    sliderValue: {
+      get() {
+        return this.$store.state.sliderValue
+      },
+      set(value) {
+        this.$store.commit('updateSliderValue', value)
       }
     },
     tabSupLayers: {
@@ -146,76 +157,59 @@ export default {
     layerOption() {
       this.changeMangroveLayers()
     },
-    supportingOption() {
-      esri.mapImageLayer.sublayers.forEach((layer) => {
-        if (layer.slider == 'support') {
-          if (this.supportingOption.includes(layer.title) == true) {
-            layer.visible = true
-          } else {
-            layer.visible = false
-          }
-        }
-      })
+    // supportingOption() {
+    //   esri.mapImageLayer.sublayers.forEach((layer) => {
+    //     if (layer.slider == 'support') {
+    //       if (this.supportingOption.includes(layer.title) == true) {
+    //         layer.visible = true
+    //       } else {
+    //         layer.visible = false
+    //       }
+    //     }
+    //   })
+    // },
+    // mangroveLayer() {
+    //   if (this.mangroveLayer == 'Current') {
+    //     if (this.layerOption !== []) {
+    //       this.manageLayerVis(this.layerOption, this.supportingOption)
+    //     }
+    //   } else if (this.mangroveLayer == 'Moderate') {
+    //     if (this.layerOption !== []) {
+    //       this.manageLayerVis(this.layerOption, this.supportingOption)
+    //     }
+    //   } else if (this.mangroveLayer == 'Intense') {
+    //     if (this.layerOption !== []) {
+    //       this.manageLayerVis(this.layerOption, this.supportingOption)
+    //     }
+    //   } else if (this.mangroveLayer == 'support') {
+    //     this.mangroveLayer = this.mangroveLayer
+    //   }
+    // },
+    layerSelection() {
+      this.updateIntensity(this.sliderValue)
+      this.updateMangroveLayerVis(this.layerSelection, this.intensity)
     },
-    mangroveLayer() {
-      if (this.mangroveLayer == 'current') {
-        if (this.layerOption !== []) {
-          this.manageLayerVis(this.layerOption, this.supportingOption)
-        }
-      } else if (this.mangroveLayer == 'moderate') {
-        if (this.layerOption !== []) {
-          this.manageLayerVis(this.layerOption, this.supportingOption)
-        }
-      } else if (this.mangroveLayer == 'intense') {
-        if (this.layerOption !== []) {
-          this.manageLayerVis(this.layerOption, this.supportingOption)
-        }
-      } else if (this.mangroveLayer == 'support') {
-        this.mangroveLayer = this.mangroveLayer
-      }
+    sliderValue() {
+      this.updateIntensity(this.sliderValue)
+      this.updateMangroveLayerVis(this.layerSelection, this.intensity)
+      this.updateClimaticLayerVis(this.climaticSelection, this.intensity)
     },
-    presenceOpacity() {
-      esri.mapImageLayer.sublayers.forEach((layer) => {
-        if (layer.slider === 'presence') {
-          layer.opacity = this.presenceOpacity
-        }
-      })
+    supportingSelection() {
+      this.updateSupportingLayerVis(this.supportingSelection)
     },
-    abundanceOpacity() {
-      esri.mapImageLayer.sublayers.forEach((layer) => {
-        if (layer.slider === 'abundance') {
-          layer.opacity = this.abundanceOpacity
-        }
-      })
+    climaticSelection() {
+      this.updateClimaticLayerVis(this.climaticSelection, this.sliderValue)
     },
-    tempOpacity() {
-      esri.mapImageLayer.sublayers.forEach((layer) => {
-        if (layer.slider === 'temp') {
-          layer.opacity = this.tempOpacity
-        }
-      })
-    },
-    precipOpacity() {
-      esri.mapImageLayer.sublayers.forEach((layer) => {
-        if (layer.slider === 'precip') {
-          layer.opacity = this.precipOpacity
-        }
-      })
-    },
-    supportOpacity() {
-      esri.mapImageLayer.sublayers.forEach((layer) => {
-        if (layer.id == this.opacityLayerId) {
-          layer.opacity = this.supportOpacity
-        }
-      })
+    socialSelection() {
+      this.updateSocialLayerVis(this.socialSelection)
     }
   },
 
   mounted() {
     // Portal IDs for TNC Basemaps. Use any id to set the map's basemap.
 
-    const tncHillshadeMapId = 'd22aed9a4acb4bc8ae8f2141732af496'
-    //const tncDarkMapId = '1f48b2b2456c44ad9c58d6741378c2ba';
+    // const tncHillshadeMapId = 'd22aed9a4acb4bc8ae8f2141732af496'
+    const tncDarkMapId = '1f48b2b2456c44ad9c58d6741378c2ba'
     // const oceansMapId = '67ab7f7c535c4687b6518e6d2343e8a2';
     // const hybridMapId = '86265e5a4bbb4187a59719cf134e0018';
 
@@ -223,7 +217,7 @@ export default {
     esri.map = new Map({
       basemap: {
         portalItem: {
-          id: tncHillshadeMapId
+          id: tncDarkMapId
         }
       }
     })
@@ -233,7 +227,7 @@ export default {
       map: esri.map,
       //center: [-70.99501567725498, 42.310350073610834],
 
-      center: [-88.814014, 31.090394],
+      center: [-88.476698, 30.134719],
       zoom: 5,
       container: this.$el
     })
@@ -418,211 +412,170 @@ export default {
       url: 'https://cirrus.tnc.org/arcgis/rest/services/Mangrove_Explorer/Mangrove_Explorer_Private/MapServer',
       title: 'Mangrove Explorer',
       sublayers: [
-        {
-          id: 0,
-          title: 'Mangrove Presence/Absence Grid',
-          visible: false,
-          slider: 'support',
-          opacity: this.supportOpacity
-        },
+        { id: 0, title: 'Supporting Layers', visible: false, intensity: undefined, opacity: 0.8 },
         {
           id: 1,
-          title: 'Mangrove Protection Status',
+          title: 'Mangrove Presence/Absence Grid',
           visible: false,
-          slider: 'support',
-          opacity: this.supportOpacity
+          intensity: undefined,
+          opacity: 0.8
         },
         {
           id: 2,
-          title: 'Tidal Wetland Complexes',
+          title: 'Mangrove Protection Status',
           visible: false,
-          slider: 'support',
-          opacity: this.supportOpacity
+          intensity: undefined,
+          opacity: 0.8
         },
         {
           id: 3,
-          title: 'Inland Wetland Migration Space',
+          title: 'Tidal Wetland Complexes',
           visible: false,
-          slider: 'support',
-          opacity: this.supportOpacity
+          intensity: undefined,
+          opacity: 0.8
         },
         {
           id: 4,
-          title: 'Mangrove Presence (1981 - 2010)',
+          title: 'Inland Wetland Migration Space',
           visible: false,
-          supLayers: {
-            current: '4',
-            moderate: '5',
-            intense: '6'
-          },
-          opacity: this.presenceOpacity,
-          slider: 'presence'
+          intensity: undefined,
+          opacity: 0.8
+        },
+        { id: 18, title: 'Climatic Drivers', visible: false, intensity: undefined, opacity: 0.8 },
+        {
+          id: 19,
+          title: 'Extreme Minimum Temperature (°F) - Current',
+          visible: false,
+          intensity: 'Current',
+          opacity: 0.8
         },
         {
-          id: 5,
-          title: 'Mangrove Presence (2071 - 2100) SSP2 - 4.5',
+          id: 20,
+          title: 'Extreme Minimum Temperature (°F) - Moderate',
           visible: false,
-          supLayers: {
-            current: '4',
-            moderate: '5',
-            intense: '6'
-          },
-          opacity: this.presenceOpacity,
-          slider: 'presence'
+          intensity: 'Moderate',
+          opacity: 0.8
         },
+        {
+          id: 21,
+          title: 'Extreme Minimum Temperature (°F) - Intense',
+          visible: false,
+          intensity: 'Intense',
+          opacity: 0.8
+        },
+        {
+          id: 22,
+          title: 'Mean Annual Precipitation (mm) - Current',
+          visible: false,
+          intensity: 'Current',
+          opacity: 0.8
+        },
+        {
+          id: 23,
+          title: 'Mean Annual Precipitation (mm) - Moderate',
+          visible: false,
+          intensity: 'Moderate',
+          opacity: 0.8
+        },
+        {
+          id: 24,
+          title: 'Mean Annual Precipitation (mm) - Intense',
+          visible: false,
+          intensity: 'Intense',
+          opacity: 0.8
+        },
+        { id: 25, title: 'Social Data', visible: false, intensity: undefined, opacity: 0.8 },
+        {
+          id: 26,
+          title: 'Social Survey Counties',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8
+        },
+        { id: 5, title: 'Climate Modeling', visible: false, intensity: undefined, opacity: 0.8 },
         {
           id: 6,
-          title: 'Mangrove Presence (2071 - 2100) SSP5 - 8.5',
-          visible: false,
-          supLayers: {
-            current: '4',
-            moderate: '5',
-            intense: '6'
-          },
-          opacity: this.presenceOpacity,
-          slider: 'presence'
+          title: 'Mangrove Presence - Current',
+          visible: true,
+          intensity: 'Current',
+          opacity: 0.8
         },
         {
           id: 7,
-          title: 'Mangrove Abundance (1981 - 2010)',
+          title: 'Mangrove Presence - Moderate',
           visible: false,
-          supLayers: {
-            current: '7',
-            moderate: '8',
-            intense: '9'
-          },
-          opacity: this.abundanceOpacity,
-          slider: 'abundance'
+          intensity: 'Moderate',
+          opacity: 0.8
         },
         {
           id: 8,
-          title: 'Mangrove Abundance (2071 - 2100) SSP2 - 4.5',
+          title: 'Mangrove Presence - Intense',
           visible: false,
-          supLayers: {
-            current: '7',
-            moderate: '8',
-            intense: '9'
-          },
-          opacity: this.abundanceOpacity,
-          slider: 'abundance'
+          intensity: 'Intense',
+          opacity: 0.8
         },
         {
           id: 9,
-          title: 'Mangrove Abundance (2071 - 2100) SSP5 - 8.5',
+          title: 'Mangrove Abundance - Current',
           visible: false,
-          supLayers: {
-            current: '7',
-            moderate: '8',
-            intense: '9'
-          },
-          opacity: this.abundanceOpacity,
-          slider: 'abundance'
+          intensity: 'Current',
+          opacity: 0.8
         },
         {
           id: 10,
-          title: 'Climatic Drivers',
+          title: 'Mangrove Abundance - Moderate',
           visible: false,
-          supLayers: {
-            current: '',
-            moderate: '',
-            intense: ''
-          }
+          intensity: 'Moderate',
+          opacity: 0.8
         },
         {
           id: 11,
-          title: 'Temperature',
+          title: 'Mangrove Abundance - Intense',
           visible: false,
-          supLayers: {
-            current: '',
-            moderate: '',
-            intense: ''
-          },
-          opacity: this.tempOpacity,
-          slider: 'temp'
+          intensity: 'Intense',
+          opacity: 0.8
         },
         {
           id: 12,
-          title: 'Temperature (1981 - 2010)',
+          title: 'Above Ground Biomass (Tg/ha) - Current',
           visible: false,
-          supLayers: {
-            current: '12',
-            moderate: '13',
-            intense: '14'
-          },
-          opacity: this.tempOpacity,
-          slider: 'temp'
+          intensity: 'Current',
+          opacity: 0.8
         },
         {
           id: 13,
-          title: 'Temperature (2071 - 2100) - 4.5',
+          title: 'Above Ground Biomass (Tg/ha) - Moderate',
           visible: false,
-          supLayers: {
-            current: '12',
-            moderate: '13',
-            intense: '14'
-          },
-          opacity: this.tempOpacity,
-          slider: 'temp'
+          intensity: 'Moderate',
+          opacity: 0.8
         },
         {
           id: 14,
-          title: 'Temperature (2071 - 2100) - 8.5',
+          title: 'Above Ground Biomass (Tg/ha) - Intense',
           visible: false,
-          supLayers: {
-            current: '12',
-            moderate: '13',
-            intense: '14'
-          },
-          opacity: this.tempOpacity,
-          slider: 'temp'
+          intensity: 'Intense',
+          opacity: 0.8
         },
         {
           id: 15,
-          title: 'Precipitation',
+          title: 'Vegetation Height (m) - Current',
           visible: false,
-          supLayers: {
-            current: '',
-            moderate: '',
-            intense: ''
-          },
-          opacity: this.precipOpacity,
-          slider: 'precip'
+          intensity: 'Current',
+          opacity: 0.8
         },
         {
           id: 16,
-          title: 'Precipitation (1981 - 2010)',
+          title: 'Vegetation Height (m) - Moderate',
           visible: false,
-          supLayers: {
-            current: '16',
-            moderate: '17',
-            intense: '18'
-          },
-          opacity: this.precipOpacity,
-          slider: 'precip'
+          intensity: 'Moderate',
+          opacity: 0.8
         },
         {
           id: 17,
-          title: 'Precipitation (2071 - 2100) - 4.5',
+          title: 'Vegetation Height (m) - Intense',
           visible: false,
-          supLayers: {
-            current: '16',
-            moderate: '17',
-            intense: '18'
-          },
-          opacity: this.precipOpacity,
-          slider: 'precip'
-        },
-        {
-          id: 18,
-          title: 'Precipitation (2071 - 2100) - 8.5',
-          visible: false,
-          supLayers: {
-            current: '16',
-            moderate: '17',
-            intense: '18'
-          },
-          opacity: this.precipOpacity,
-          slider: 'precip'
+          intensity: 'Intense',
+          opacity: 0.8
         }
       ]
     })
@@ -845,24 +798,24 @@ export default {
         array.forEach((layerLabel) => {
           esri.mapImageLayer.sublayers.forEach((layer) => {
             if (layerLabel == layer.title) {
-              if (this.mangroveLayer == 'current') {
-                let sl = esri.mapImageLayer.findSublayerById(parseInt(layer.supLayers.current))
+              if (this.mangroveLayer == 'Current') {
+                let sl = esri.mapImageLayer.findSublayerById(parseInt(layer.supLayers.Current))
 
                 layer.visible = false
                 sl.visible = true
 
                 newLayerOption.push(sl.title)
               }
-              if (this.mangroveLayer == 'moderate') {
-                let sl = esri.mapImageLayer.findSublayerById(parseInt(layer.supLayers.moderate))
+              if (this.mangroveLayer == 'Moderate') {
+                let sl = esri.mapImageLayer.findSublayerById(parseInt(layer.supLayers.Moderate))
 
                 layer.visible = false
                 sl.visible = true
 
                 newLayerOption.push(sl.title)
               }
-              if (this.mangroveLayer == 'intense') {
-                let sl = esri.mapImageLayer.findSublayerById(parseInt(layer.supLayers.intense))
+              if (this.mangroveLayer == 'Intense') {
+                let sl = esri.mapImageLayer.findSublayerById(parseInt(layer.supLayers.Intense))
 
                 layer.visible = false
                 sl.visible = true
@@ -885,6 +838,82 @@ export default {
       }
 
       this.layerOption = newLayerOption
+    },
+
+    updateMangroveLayerVis(type, intensity) {
+      if (this.previousMangroveLayer !== '') {
+        esri.mapImageLayer.findSublayerById(this.previousMangroveLayer).visible = false
+      }
+
+      esri.mapImageLayer.sublayers.forEach((layer) => {
+        if (layer.title.includes(type) == true) {
+          if (layer.intensity == intensity) {
+            this.previousMangroveLayer = layer.id
+            layer.visible = true
+          } else {
+            layer.visible = false
+          }
+        }
+      })
+    },
+
+    updateSupportingLayerVis(array) {
+      esri.mapImageLayer.sublayers.forEach((layer) => {
+        if (layer.id == 1 || layer.id == 2 || layer.id == 3 || layer.id == 4) {
+          if (array.includes(layer.title) == true) {
+            layer.visible = true
+          } else {
+            layer.visible = false
+          }
+        }
+      })
+    },
+
+    updateClimaticLayerVis(title, intensity) {
+      if (this.previousClimaticLayer !== '') {
+        esri.mapImageLayer.findSublayerById(this.previousClimaticLayer).visible = false
+      }
+
+      if (intensity == 0) {
+        intensity = 'Current'
+      } else if (intensity == 1) {
+        intensity = 'Moderate'
+      } else if (intensity == 2) {
+        intensity = 'Intense'
+      }
+
+      esri.mapImageLayer.sublayers.forEach((layer) => {
+        if (layer.title.includes(title) == true) {
+          if (layer.intensity == intensity) {
+            this.previousClimaticLayer = layer.id
+            layer.visible = true
+          } else {
+            layer.visible = false
+          }
+        }
+      })
+    },
+
+    updateSocialLayerVis(title) {
+      esri.mapImageLayer.sublayers.forEach((layer) => {
+        if (layer.id >= 26) {
+          if (layer.title.includes(title) == true) {
+            layer.visible = true
+          } else {
+            layer.visible = false
+          }
+        }
+      })
+    },
+
+    updateIntensity(sliderVal) {
+      if (sliderVal == 0) {
+        this.intensity = 'Current'
+      } else if (sliderVal == 1) {
+        this.intensity = 'Moderate'
+      } else if (sliderVal == 2) {
+        this.intensity = 'Intense'
+      }
     }
   }
 }

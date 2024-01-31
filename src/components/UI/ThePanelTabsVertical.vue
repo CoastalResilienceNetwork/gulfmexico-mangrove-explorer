@@ -1,10 +1,10 @@
 <template>
   <div class="q-pt-none">
-    <q-splitter style="overflow: hidden" v-model="splitterModel" unit="px" :limits="[60, 100]">
-      <!--Example with supporting layers in a vertical tab-->
+    <!-- <q-splitter style="overflow: hidden" v-model="splitterModel" unit="px" :limits="[60, 100]"> -->
+    <!--Example with supporting layers in a vertical tab-->
 
-      <template v-slot:before>
-        <q-tabs
+    <!-- <template v-slot:before> -->
+    <!-- <q-tabs
           dark
           v-model="tab"
           vertical
@@ -13,10 +13,11 @@
           active-bg-color="primary"
           indicator-color="white"
           dense
-        >
-          <!--each tab has two presentations, full or condensed, based on the size of the screen-->
+          style="width: 0px !important"
+        > -->
+    <!--each tab has two presentations, full or condensed, based on the size of the screen-->
 
-          <q-separator></q-separator>
+    <!-- <q-separator></q-separator>
           <q-route-tab
             v-if="!$store.state.condensedTabs && !smallScreen"
             style="padding: 10px"
@@ -102,44 +103,44 @@
           </q-route-tab>
           <q-separator></q-separator>
         </q-tabs>
-      </template>
+      </template> -->
 
-      <template v-slot:after>
-        <q-tab-panels v-model="tab" animated vertical keep-alive>
-          <q-tab-panel name="tab1" class="q-pr-none q-pl-lg q-pt-lg q-pb-lg">
-            <q-scroll-area id="" class="panel panelM" :thumb-style="{ width: '7px' }">
-              <div class="q-mr-lg">
-                <keep-alive><tab1></tab1></keep-alive>
-              </div>
-            </q-scroll-area>
-          </q-tab-panel>
+    <!-- <template v-slot:after> -->
+    <!-- <q-tab-panels v-model="tab" animated vertical keep-alive> -->
+    <q-tab-panel name="tab1" class="q-pr-none q-pl-lg q-pt-lg q-pb-lg">
+      <q-scroll-area id="" class="panel panelM" :thumb-style="{ display: 'none !important' }">
+        <div class="q-mr-lg">
+          <keep-alive><tab1></tab1></keep-alive>
+        </div>
+      </q-scroll-area>
+    </q-tab-panel>
 
-          <q-tab-panel name="tab2" class="q-pr-none q-pl-lg q-pt-lg q-pb-lg">
-            <q-scroll-area id="" class="panel panelM" :thumb-style="{ width: '7px' }">
-              <div class="q-mr-lg">
-                <keep-alive><tab2></tab2></keep-alive>
-              </div>
-            </q-scroll-area>
-          </q-tab-panel>
+    <!-- <q-tab-panel name="tab2" class="q-pr-none q-pl-lg q-pt-lg q-pb-lg">
+        <q-scroll-area id="" class="panel panelM" :thumb-style="{ width: '7px' }">
+          <div class="q-mr-lg">
+            <keep-alive><tab2></tab2></keep-alive>
+          </div>
+        </q-scroll-area>
+      </q-tab-panel>
 
-          <q-tab-panel name="tab3" class="q-pr-none q-pl-lg q-pt-lg q-pb-lg">
-            <q-scroll-area id="" class="panel panelM" :thumb-style="{ width: '7px' }">
-              <div class="q-mr-lg">
-                <keep-alive><tab3></tab3></keep-alive>
-              </div>
-            </q-scroll-area>
-          </q-tab-panel>
+      <q-tab-panel name="tab3" class="q-pr-none q-pl-lg q-pt-lg q-pb-lg">
+        <q-scroll-area id="" class="panel panelM" :thumb-style="{ width: '7px' }">
+          <div class="q-mr-lg">
+            <keep-alive><tab3></tab3></keep-alive>
+          </div>
+        </q-scroll-area>
+      </q-tab-panel>
 
-          <q-tab-panel name="layers" class="q-pr-none q-pl-lg q-pt-lg q-pb-lg">
-            <q-scroll-area id="" class="panel panelM" :thumb-style="{ width: '7px' }">
-              <div class="q-mr-lg">
-                <keep-alive><sup-layers></sup-layers></keep-alive>
-              </div>
-            </q-scroll-area>
-          </q-tab-panel>
-        </q-tab-panels>
-      </template>
-    </q-splitter>
+      <q-tab-panel name="layers" class="q-pr-none q-pl-lg q-pt-lg q-pb-lg">
+        <q-scroll-area id="" class="panel panelM" :thumb-style="{ width: '7px' }">
+          <div class="q-mr-lg">
+            <keep-alive><sup-layers></sup-layers></keep-alive>
+          </div>
+        </q-scroll-area>
+      </q-tab-panel>
+    </q-tab-panels> -->
+    <!-- </template> -->
+    <!-- </q-splitter> -->
   </div>
 </template>
 

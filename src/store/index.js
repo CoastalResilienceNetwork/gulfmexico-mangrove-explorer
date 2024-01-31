@@ -53,10 +53,11 @@ export default createStore({
     mapPrintURI: '',
     layerOption: [],
     mangroveLayer: '',
-    presenceOpacity: 0.8,
-    abundanceOpacity: 0.8,
-    tempOpacity: 0.8,
-    precipOpacity: 0.8,
+    layerSelection: 'Mangrove Presence',
+    climaticSelection: 'None',
+    supportingSelection: [],
+    socialSelection: 'None',
+    sliderValue: 0,
     supportOpacity: 0.8,
     tabSupLayers: [],
     selectedOption: [],
@@ -99,17 +100,20 @@ export default createStore({
     updateMangroveLayer(state, val) {
       state.mangroveLayer = val
     },
-    updatePresenceOpacity(state, val) {
-      state.presenceOpacity = val
+    updateLayerSelection(state, val) {
+      state.layerSelection = val
     },
-    updateAbundanceOpacity(state, val) {
-      state.abundanceOpacity = val
+    updateClimaticSelection(state, val) {
+      state.climaticSelection = val
     },
-    updateTempOpacity(state, val) {
-      state.tempOpacity = val
+    updateSupportingSelection(state, val) {
+      state.supportingSelection = val
     },
-    updatePrecipOpacity(state, val) {
-      state.precipOpacity = val
+    updateSocialSelection(state, val) {
+      state.socialSelection = val
+    },
+    updateSliderValue(state, val) {
+      state.sliderValue = val
     },
     updateTabSupLayers(state, val) {
       state.tabSupLayers = val
