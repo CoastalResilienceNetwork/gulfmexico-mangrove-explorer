@@ -93,14 +93,14 @@ export default {
           showDesc: false
         },
         {
-          label: 'Mangrove Abundance',
-          value: 'Mangrove Abundance',
+          label: 'Mangrove Relative Abundance',
+          value: 'Mangrove Relative Abundance',
           desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
           showDesc: false
         },
         {
-          label: 'Vegetation Height',
-          value: 'Vegetation Height',
+          label: 'Wetland Vegetation Height',
+          value: 'Wetland Vegetation Height',
           desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
           showDesc: false
         },
@@ -177,9 +177,9 @@ export default {
         }
       ],
       sliderLabels: [
-        { value: 0, label: 'Current' },
+        { value: 0, label: 'Recent' },
         { value: 1, label: 'Moderate' },
-        { value: 2, label: 'Intense' }
+        { value: 2, label: 'Severe' }
       ]
     }
   },

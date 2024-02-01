@@ -428,13 +428,6 @@ export default {
           opacity: 0.8
         },
         {
-          id: 3,
-          title: 'Tidal Wetland Complexes',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8
-        },
-        {
           id: 4,
           title: 'Inland Wetland Migration Space',
           visible: false,
@@ -444,42 +437,42 @@ export default {
         { id: 18, title: 'Climatic Drivers', visible: false, intensity: undefined, opacity: 0.8 },
         {
           id: 19,
-          title: 'Extreme Minimum Temperature (°F) - Current',
+          title: 'Extreme Minimum Temperature - Recent Climate',
           visible: false,
           intensity: 'Current',
           opacity: 0.8
         },
         {
           id: 20,
-          title: 'Extreme Minimum Temperature (°F) - Moderate',
+          title: 'Extreme Minimum Temperature - Moderate Climate Change',
           visible: false,
           intensity: 'Moderate',
           opacity: 0.8
         },
         {
           id: 21,
-          title: 'Extreme Minimum Temperature (°F) - Intense',
+          title: 'Extreme Minimum Temperature - Severe Climate Change',
           visible: false,
           intensity: 'Intense',
           opacity: 0.8
         },
         {
           id: 22,
-          title: 'Mean Annual Precipitation (mm) - Current',
+          title: 'Mean Annual Precipitation - Recent Climate',
           visible: false,
           intensity: 'Current',
           opacity: 0.8
         },
         {
           id: 23,
-          title: 'Mean Annual Precipitation (mm) - Moderate',
+          title: 'Mean Annual Precipitation - Moderate Climate Change',
           visible: false,
           intensity: 'Moderate',
           opacity: 0.8
         },
         {
           id: 24,
-          title: 'Mean Annual Precipitation (mm) - Intense',
+          title: 'Mean Annual Precipitation - Severe Climate Change',
           visible: false,
           intensity: 'Intense',
           opacity: 0.8
@@ -495,86 +488,93 @@ export default {
         { id: 5, title: 'Climate Modeling', visible: false, intensity: undefined, opacity: 0.8 },
         {
           id: 6,
-          title: 'Mangrove Presence - Current',
+          title: 'Mangrove Presence - Recent Climate',
           visible: true,
           intensity: 'Current',
           opacity: 0.8
         },
         {
           id: 7,
-          title: 'Mangrove Presence - Moderate',
+          title: 'Mangrove Presence - Moderate Climate Change',
           visible: false,
           intensity: 'Moderate',
           opacity: 0.8
         },
         {
           id: 8,
-          title: 'Mangrove Presence - Intense',
+          title: 'Mangrove Presence - Severe Climate Change',
           visible: false,
           intensity: 'Intense',
           opacity: 0.8
         },
         {
           id: 9,
-          title: 'Mangrove Abundance - Current',
+          title: 'Mangrove Relative Abundance - Recent Climate',
           visible: false,
           intensity: 'Current',
           opacity: 0.8
         },
         {
           id: 10,
-          title: 'Mangrove Abundance - Moderate',
+          title: 'Mangrove Relative Abundance - Moderate Climate Change',
           visible: false,
           intensity: 'Moderate',
           opacity: 0.8
         },
         {
           id: 11,
-          title: 'Mangrove Abundance - Intense',
+          title: 'Mangrove Relative Abundance - Severe Climate Change',
           visible: false,
           intensity: 'Intense',
           opacity: 0.8
         },
         {
           id: 12,
-          title: 'Above Ground Biomass (Tg/ha) - Current',
+          title: 'Above Ground Biomass - Recent Climate',
           visible: false,
           intensity: 'Current',
           opacity: 0.8
         },
         {
           id: 13,
-          title: 'Above Ground Biomass (Tg/ha) - Moderate',
+          title: 'Above Ground Biomass - Moderate Climate Change',
           visible: false,
           intensity: 'Moderate',
           opacity: 0.8
         },
         {
           id: 14,
-          title: 'Above Ground Biomass (Tg/ha) - Intense',
+          title: 'Above Ground Biomass - Severe Climate Change',
           visible: false,
           intensity: 'Intense',
           opacity: 0.8
         },
         {
           id: 15,
-          title: 'Vegetation Height (m) - Current',
+          title: 'Wetland Vegetation Height - Recent Climate',
           visible: false,
           intensity: 'Current',
           opacity: 0.8
         },
         {
           id: 16,
-          title: 'Vegetation Height (m) - Moderate',
+          title: 'Wetland Vegetation Height - Moderate Climate Change',
           visible: false,
           intensity: 'Moderate',
           opacity: 0.8
         },
         {
           id: 17,
-          title: 'Vegetation Height (m) - Intense',
+          title: 'Wetland Vegetation Height - Severe Climate Change',
           visible: false,
           intensity: 'Intense',
+          opacity: 0.8
+        },
+        {
+          id: 3,
+          title: 'Tidal Wetland Complexes',
+          visible: false,
+          intensity: undefined,
           opacity: 0.8
         }
       ]
