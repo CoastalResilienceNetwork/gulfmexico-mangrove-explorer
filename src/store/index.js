@@ -14,6 +14,33 @@ export default createStore({
         {
           mapService:
             'https://cirrus.tnc.org/arcgis/rest/services/Mangrove_Explorer/Mangrove_Explorer_Private/MapServer',
+          skipLayers: [
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+            24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45,
+            46, 47, 48
+          ],
+          title: 'Mangrove Explorer',
+          popupTemplate: [
+            {
+              id: 9999,
+              fields: [
+                { fieldName: 'Subbasin', label: 'Sub Basin' },
+                { fieldName: 'SubbasinR', label: 'Sub Basin R' },
+                { fieldName: 'AreaC', label: 'Area(units)' }
+              ]
+            },
+            // for now this placeholder is required.  I am not sure why but the last layer in this list will not display correctly.
+            {
+              id: 9999,
+              fields: [{ fieldName: 'none', label: 'placeholder' }]
+            }
+          ]
+        }
+      ],
+      forLayerDescriptions: [
+        {
+          mapService:
+            'https://cirrus.tnc.org/arcgis/rest/services/Mangrove_Explorer/Mangrove_Explorer_Private/MapServer',
           skipLayers: [],
           title: 'Mangrove Explorer',
           popupTemplate: [
@@ -34,9 +61,9 @@ export default createStore({
         }
       ],
 
-      supportingLayersTitle: 'View Mangrove Layers',
-      supportingLayersOnMap: false,
-      supportingLayersInPanel: true,
+      supportingLayersTitle: 'Supporting Mangrove Layers',
+      supportingLayersOnMap: true,
+      supportingLayersInPanel: false,
       panelDisplayType: 'plain', //plain, tabsHorizontal, tabsVertical
       appDisplayType: 'webMap', //storyMap, webMap
       condensedTabs: false,
@@ -53,16 +80,19 @@ export default createStore({
     mapPrintURI: '',
     layerOption: [],
     mangroveLayer: '',
-    layerSelection: 'Mangrove Presence',
-    climaticSelection: 'None',
+    layerSelection: ['Mangrove Presence'],
+    climaticSelection: ['None'],
     supportingSelection: [],
-    socialSelection: 'None',
+    socialSelection: ['None'],
+    subSocialSelection: ['None'],
     sliderValue: 0,
     supportOpacity: 0.8,
     tabSupLayers: [],
     selectedOption: [],
     supportingOption: [],
-    opacityLayerId: -1
+    opacityLayerId: -1,
+    layerDescriptions: [],
+    descriptionsComplete: false
   },
   mutations: {
     //data retrieved from web services
@@ -112,6 +142,9 @@ export default createStore({
     updateSocialSelection(state, val) {
       state.socialSelection = val
     },
+    updateSubSocialSelection(state, val) {
+      state.subSocialSelection = val
+    },
     updateSliderValue(state, val) {
       state.sliderValue = val
     },
@@ -129,6 +162,12 @@ export default createStore({
     },
     updateOpacityLayerId(state, val) {
       state.opacityLayerId = val
+    },
+    updateLayerDescriptions(state, val) {
+      state.layerDescriptions = val
+    },
+    updateDescriptionsComplete(state, val) {
+      state.descriptionsComplete = val
     }
   },
 
@@ -146,6 +185,7 @@ export default createStore({
           }).then(function (response) {
             let layerJson = response.data.layers
             //push main header to the object
+
             obj.push({
               label: service.title,
               children: [],
@@ -153,6 +193,7 @@ export default createStore({
               noTick: true,
               type: 'header'
             })
+
             let storeNodes = []
             let type = ''
             layerJson.forEach((l) => {
@@ -166,6 +207,7 @@ export default createStore({
                 // Group Layer with no parent
                 if (l.type == 'Group Layer' && !l.parentLayer) {
                   //push the object to the list as child of main header
+
                   obj[index].children.push({
                     label: l.name,
                     children: [],
@@ -173,6 +215,7 @@ export default createStore({
                     noTick: true,
                     type: type
                   })
+
                   //find the index of the object we just pushed, saves the reference to the location
                   let parentIndex = obj[index].children.findIndex(
                     (obj) => obj.id == l.id + '_' + index
@@ -220,6 +263,7 @@ export default createStore({
                   //set the location of the parent
                   let parentLoc = storeNodes[nodesIndex].parentLoc
                   //push the new parent into the found parent as child
+
                   parentLoc.children.push({
                     label: l.name,
                     children: [],
@@ -227,6 +271,7 @@ export default createStore({
                     noTick: true,
                     type: type
                   })
+
                   //find the index of the child we just pushed
                   let parentIndex = parentLoc.children.findIndex(
                     (obj) => obj.id == l.id + '_' + index

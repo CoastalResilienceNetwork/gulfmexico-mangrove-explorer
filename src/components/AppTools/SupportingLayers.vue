@@ -4,7 +4,7 @@
       {{ $store.state.config.supportingLayersTitle }}
     </p>
     <q-separator></q-separator>
-    <p class="q-pa-md"></p>
+    <!-- <p class="q-pa-md"></p> -->
     <!--q-input
       ref="filterRef"
       class="q-mb-md"
@@ -22,13 +22,7 @@
         />
       </template>
     </q-input-->
-    <q-linear-progress
-      v-if="!showTree"
-      dark
-      query
-      color="accent"
-      class="q-mt-sm"
-    />
+    <q-linear-progress v-if="!showTree" dark query color="accent" class="q-mt-sm" />
     <div v-if="showTree">
       <q-tree
         ref="tree"
@@ -70,19 +64,16 @@
                 id="expandMore"
               >
                 <q-card class="">
-                  <q-scroll-area
+                  <!-- <q-scroll-area
                     v-if="prop.node.description"
-                    style="height:200px"
+                    style="height: 200px"
                     :thumb-style="{
                       background: 'var(--q-secondary)',
-                      width: '4px',
+                      width: '4px'
                     }"
-                  >
-                    <div
-                      class="q-mr-md text-blue-grey-9"
-                      v-html="prop.node.description"
-                    ></div>
-                  </q-scroll-area>
+                  > -->
+                  <div class="q-mr-md text-blue-grey-9" v-html="prop.node.description"></div>
+                  <!-- </q-scroll-area> -->
 
                   <div class="row items-left q-pa-sm">
                     <div class="col-1">
@@ -93,9 +84,7 @@
                         color="secondary"
                         snap
                         dense
-                        @change="
-                          setTransparency($event, prop.node.id, prop.node.type)
-                        "
+                        @change="setTransparency($event, prop.node.id, prop.node.type)"
                         :min="0"
                         :max="1"
                         :step="0.1"
@@ -130,68 +119,68 @@ export default {
       filter: '',
       filterRef: null,
       showTree: false,
-      treeData: [],
-    };
+      treeData: []
+    }
   },
   props: ['displayClass'],
   computed: {
     slReady() {
-      return this.$store.state.data.slReady;
-    },
+      return this.$store.state.data.slReady
+    }
   },
   created() {
     if (this.slReady) {
-      this.treeData = this.$store.state.data.supportingLayers;
-      this.showTree = true;
+      this.treeData = this.$store.state.data.supportingLayers
+      this.showTree = true
     } else {
-      this.$store.dispatch('requestSupportingLayers');
+      this.$store.dispatch('requestSupportingLayers')
     }
   },
 
   watch: {
     ticked() {
       //get type and create ticked object with layer id and layer type to retrieve in map
-      let tickedObj = [];
+      let tickedObj = []
       this.ticked.forEach((layer) => {
-        let node = this.$refs.tree.getNodeByKey(layer);
-        let type = node.type;
-        let layerInfo = layer.split('_');
+        let node = this.$refs.tree.getNodeByKey(layer)
+        let type = node.type
+        let layerInfo = layer.split('_')
         tickedObj.push({
           mapServiceIndex: layerInfo[1],
           id: layerInfo[0],
-          type: type,
-        });
-      });
+          type: type
+        })
+      })
       this.$store.commit('updateTreeState', {
         tickedObj: tickedObj,
         ticked: this.ticked,
-        expanded: this.expanded,
-      });
+        expanded: this.expanded
+      })
     },
     slReady() {
       if (this.slReady) {
-        this.treeData = this.$store.state.data.supportingLayers;
-        this.showTree = true;
+        this.treeData = this.$store.state.data.supportingLayers
+        this.showTree = true
       }
-    },
+    }
   },
   methods: {
     setTransparency(value, id, type) {
-      let layerInfo = id.split('_');
+      let layerInfo = id.split('_')
       let layerObj = {
         value: value,
         id: layerInfo[0],
         mapServiceIndex: layerInfo[1],
-        type: type,
-      };
-      this.$store.commit('updateSupportingLayerVisibleOpacity', layerObj);
+        type: type
+      }
+      this.$store.commit('updateSupportingLayerVisibleOpacity', layerObj)
     },
     resetFilter() {
-      this.filter = '';
-      this.filterRef.focus();
-    },
-  },
-};
+      this.filter = ''
+      this.filterRef.focus()
+    }
+  }
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

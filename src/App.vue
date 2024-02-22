@@ -50,7 +50,7 @@
             draggable="false"
             color="primary"
             text-color="white"
-            size="20px"
+            size="0px"
             icon="drag_indicator"
           />
         </template>
@@ -80,7 +80,7 @@ export default {
   },
   data() {
     return {
-      splitterModel: this.$store.state.config.panelDisplayType == 'plain' ? 550 : 750,
+      splitterModel: this.$store.state.config.panelDisplayType == 'plain' ? 500 : 750,
       splitterModelMobile: this.$store.state.config.panelDisplayType == 'tabsVertical' ? 300 : 400,
       panelScreenSize: 'v-slot:before',
       //for the service worker (pwa update)

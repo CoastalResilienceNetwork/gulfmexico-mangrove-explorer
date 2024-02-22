@@ -3,6 +3,27 @@
     <div id="supportingLayers" v-if="$store.state.config.supportingLayersOnMap">
       <SupportingLayers displayClass="supportingLayersMap" />
     </div>
+    <div id="legendContainer" style="width: 20vw; display: flex; margin: 0px !important"></div>
+    <div
+      id="socialContainer"
+      style="width: 50vw; height: 38vh; border: 5px grey solid; border-radius: 4px"
+    >
+      <img
+        src="../../assets/legend.png"
+        height="90%"
+        width="auto"
+        style="margin-top: auto; margin-bottom: auto; display: block"
+      />
+      <q-btn
+        width="100px"
+        height="100px"
+        color="red"
+        style="float: right; position: absolute; bottom: 5px; right: 5px; border-radius: 0px"
+        icon-right="fas fa-arrow-right"
+        label="1 of 5"
+      >
+      </q-btn>
+    </div>
   </div>
 </template>
 
@@ -20,6 +41,7 @@ import FeatureLayer from '@arcgis/core/layers/FeatureLayer'
 import ScaleBar from '@arcgis/core/widgets/ScaleBar'
 import Portal from '@arcgis/core/portal/Portal'
 import PortalBasemapsSource from '@arcgis/core/widgets/BasemapGallery/support/PortalBasemapsSource'
+import esriRequest from '@arcgis/core/request'
 
 //global in order to have access to the maplayer
 let esri = {
@@ -30,7 +52,13 @@ let esri = {
   map: '',
   measurement: '',
   lgExpand: '',
-  mapImageLayer: ''
+  mapImageLayer: '',
+  socialExpand: '',
+  socialContent: {
+    title: '',
+    imageSrc: '',
+    description: ''
+  }
 }
 
 export default {
@@ -43,7 +71,8 @@ export default {
       active: true,
       previousMangroveLayer: 6,
       previousClimaticLayer: '',
-      intensity: ''
+      intensity: '',
+      subLegendInfo: false
     }
   },
   computed: {
@@ -103,6 +132,14 @@ export default {
         this.$store.commit('updateSocialSelection', value)
       }
     },
+    subSocialSelection: {
+      get() {
+        return this.$store.state.subSocialSelection
+      },
+      set(value) {
+        this.$store.commit('updateSubSocialSelection', value)
+      }
+    },
     sliderValue: {
       get() {
         return this.$store.state.sliderValue
@@ -145,6 +182,17 @@ export default {
     },
     opacityLayerId() {
       return this.$store.state.opacityLayerId
+    },
+    layerDescriptions: {
+      get() {
+        return this.$store.state.layerDescriptions
+      },
+      set(value) {
+        this.$store.commit('updateLayerDescriptions', value)
+      }
+    },
+    descriptionsComplete() {
+      return this.$store.state.descriptionsComplete
     }
   },
   watch: {
@@ -157,51 +205,59 @@ export default {
     layerOption() {
       this.changeMangroveLayers()
     },
-    // supportingOption() {
-    //   esri.mapImageLayer.sublayers.forEach((layer) => {
-    //     if (layer.slider == 'support') {
-    //       if (this.supportingOption.includes(layer.title) == true) {
-    //         layer.visible = true
-    //       } else {
-    //         layer.visible = false
-    //       }
-    //     }
-    //   })
-    // },
-    // mangroveLayer() {
-    //   if (this.mangroveLayer == 'Current') {
-    //     if (this.layerOption !== []) {
-    //       this.manageLayerVis(this.layerOption, this.supportingOption)
-    //     }
-    //   } else if (this.mangroveLayer == 'Moderate') {
-    //     if (this.layerOption !== []) {
-    //       this.manageLayerVis(this.layerOption, this.supportingOption)
-    //     }
-    //   } else if (this.mangroveLayer == 'Intense') {
-    //     if (this.layerOption !== []) {
-    //       this.manageLayerVis(this.layerOption, this.supportingOption)
-    //     }
-    //   } else if (this.mangroveLayer == 'support') {
-    //     this.mangroveLayer = this.mangroveLayer
-    //   }
-    // },
+    supportingOption() {
+      esri.mapImageLayer.sublayers.forEach((layer) => {
+        if (layer.slider == 'support') {
+          if (this.supportingOption.includes(layer.title) == true) {
+            layer.visible = true
+          } else {
+            layer.visible = false
+          }
+        }
+      })
+    },
+    mangroveLayer() {
+      if (this.mangroveLayer == 'Current') {
+        if (this.layerOption !== []) {
+          this.manageLayerVis(this.layerOption, this.supportingOption)
+        }
+      } else if (this.mangroveLayer == 'Moderate') {
+        if (this.layerOption !== []) {
+          this.manageLayerVis(this.layerOption, this.supportingOption)
+        }
+      } else if (this.mangroveLayer == 'Intense') {
+        if (this.layerOption !== []) {
+          this.manageLayerVis(this.layerOption, this.supportingOption)
+        }
+      } else if (this.mangroveLayer == 'support') {
+        this.mangroveLayer = this.mangroveLayer
+      }
+    },
     layerSelection() {
       this.updateIntensity(this.sliderValue)
-      this.updateMangroveLayerVis(this.layerSelection, this.intensity)
+      this.updateMangroveLayerVis(this.layerSelection[0], this.intensity)
     },
     sliderValue() {
       this.updateIntensity(this.sliderValue)
-      this.updateMangroveLayerVis(this.layerSelection, this.intensity)
-      this.updateClimaticLayerVis(this.climaticSelection, this.intensity)
+      this.updateMangroveLayerVis(this.layerSelection[0], this.intensity)
+      this.updateClimaticLayerVis(this.climaticSelection[0], this.intensity)
     },
     supportingSelection() {
       this.updateSupportingLayerVis(this.supportingSelection)
     },
     climaticSelection() {
-      this.updateClimaticLayerVis(this.climaticSelection, this.sliderValue)
+      this.updateClimaticLayerVis(this.climaticSelection[0], this.sliderValue)
     },
     socialSelection() {
-      this.updateSocialLayerVis(this.socialSelection)
+      this.updateSocialLayerVis(this.socialSelection[0])
+    },
+    subSocialSelection() {
+      this.updateSubSocialLayerVis(this.subSocialSelection[0])
+    },
+    descriptionsComplete() {
+      if (this.descriptionsComplete == true) {
+        this.getDescriptions()
+      }
     }
   },
 
@@ -225,9 +281,7 @@ export default {
     //create the map view
     esri.mapView = new MapView({
       map: esri.map,
-      //center: [-70.99501567725498, 42.310350073610834],
-
-      center: [-88.476698, 30.134719],
+      center: [-88.900345, 29.222555],
       zoom: 5,
       container: this.$el
     })
@@ -314,11 +368,11 @@ export default {
     if (this.$store.state.config.supportingLayersOnMap) {
       let supportingLayersExpand = new Expand({
         expandIconClass: 'esri-icon-layer-list',
-        expandTooltip: 'Expand LayerList',
+        expandTooltip: 'Supporting Layers',
         view: esri.mapView,
         content: document.getElementById('supportingLayers')
       })
-      esri.mapView.ui.add(supportingLayersExpand, 'top-right')
+      esri.mapView.ui.add(supportingLayersExpand, 'top-left')
     }
 
     //add scalebar widget
@@ -326,9 +380,9 @@ export default {
       view: esri.mapView,
       unit: 'dual'
     })
-    esri.mapView.ui.add(scaleBar, {
-      position: 'bottom-right'
-    })
+    // esri.mapView.ui.add(scaleBar, {
+    //   position: 'bottom-right'
+    // })
 
     //add measure tools
     esri.measurement = new Measurement({
@@ -338,13 +392,22 @@ export default {
 
     // create legend widget
     esri.legend = new Legend({
-      view: esri.mapView
+      view: esri.mapView,
+      container: legendContainer
+      // style: {
+      //   type: 'card'
+      //   // layout: 'side-by-side'
+      // }
+    })
+
+    esri.mapView.ui.add(esri.legend, {
+      position: 'bottom-left'
     })
 
     // create expand widget to hide and show legend
     esri.lgExpand = new Expand({
       view: esri.mapView,
-      content: esri.legend
+      content: legendContainer
     })
 
     // add expand to map
@@ -361,6 +424,18 @@ export default {
         esri.lgExpand.expand()
       }
     })
+
+    // create expand widget for policy and social context
+    esri.socialExpand = new Expand({
+      id: 'expand-widget-id',
+      view: esri.mapView,
+      container: socialContainer,
+      expandIcon: 'apply-changes',
+      collapseIcon: 'apply-changes',
+      visible: false
+    })
+
+    esri.mapView.ui.add(esri.socialExpand, 'bottom-right')
 
     // Create portal. Used for PortalBasemapSource below
     const portal = new Portal()
@@ -412,175 +487,566 @@ export default {
       url: 'https://cirrus.tnc.org/arcgis/rest/services/Mangrove_Explorer/Mangrove_Explorer_Private/MapServer',
       title: 'Mangrove Explorer',
       sublayers: [
-        { id: 0, title: 'Supporting Layers', visible: false, intensity: undefined, opacity: 0.8 },
+        {
+          id: 0,
+          title: 'Mangrove Distribution in the SE United States',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8
+        },
         {
           id: 1,
-          title: 'Mangrove Presence/Absence Grid',
+          title: 'Mangrove Presence and Absence (based on expert input 2023)',
           visible: false,
           intensity: undefined,
           opacity: 0.8
         },
         {
           id: 2,
-          title: 'Mangrove Protection Status',
+          title: 'Mangrove Expansion Zones',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8
+        },
+        {
+          id: 3,
+          title: 'Potential Change in Mangrove Presence by 2100',
           visible: false,
           intensity: undefined,
           opacity: 0.8
         },
         {
           id: 4,
-          title: 'Inland Wetland Migration Space',
+          title: 'Modeling Current and Future Mangroves',
           visible: false,
           intensity: undefined,
           opacity: 0.8
         },
-        { id: 18, title: 'Climatic Drivers', visible: false, intensity: undefined, opacity: 0.8 },
+        {
+          id: 5,
+          title: 'Current and Future Mangroves',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8
+        },
+        {
+          id: 18,
+          title: 'Climatic Drivers of Mangrove Change',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8
+        },
         {
           id: 19,
-          title: 'Extreme Minimum Temperature - Recent Climate',
+          title: 'Extreme Minimum Temperature (Recent Climate)',
           visible: false,
           intensity: 'Current',
           opacity: 0.8
         },
         {
           id: 20,
-          title: 'Extreme Minimum Temperature - Moderate Climate Change',
+          title: 'Extreme Minimum Temperature (Future Moderate Climate)',
           visible: false,
           intensity: 'Moderate',
           opacity: 0.8
         },
         {
           id: 21,
-          title: 'Extreme Minimum Temperature - Severe Climate Change',
+          title: 'Extreme Minimum Temperature (Future Severe Climate)',
           visible: false,
           intensity: 'Intense',
           opacity: 0.8
         },
         {
           id: 22,
-          title: 'Mean Annual Precipitation - Recent Climate',
+          title: 'Mean Annual Precipitation (Recent Climate)',
           visible: false,
           intensity: 'Current',
           opacity: 0.8
         },
         {
           id: 23,
-          title: 'Mean Annual Precipitation - Moderate Climate Change',
+          title: 'Mean Annual Precipitation (Future Moderate Climate)',
           visible: false,
           intensity: 'Moderate',
           opacity: 0.8
         },
         {
           id: 24,
-          title: 'Mean Annual Precipitation - Severe Climate Change',
+          title: 'Mean Annual Precipitation (Future Severe Climate)',
           visible: false,
           intensity: 'Intense',
           opacity: 0.8
         },
-        { id: 25, title: 'Social Data', visible: false, intensity: undefined, opacity: 0.8 },
+        {
+          id: 25,
+          title: 'Policy and Social Context',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
         {
           id: 26,
-          title: 'Social Survey Counties',
+          title: 'Where are mangroves protected by state law?',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 27,
+          title: 'What do people think is driving mangrove change in expansion areas?',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 28,
+          title: 'What actions do people think need to be taken for mangroves in expansion areas?',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 29,
+          title:
+            'How do people in mangrove expansion areas perceive the benefits provided by marshes versus mangroves?',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 30,
+          title: 'Perceptions are consistent that mangroves are better',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 31,
+          title: 'Providing nesting platforms for birds',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 32,
+          title: 'Recovering from freeze events',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 33,
+          title: 'Providing nectar flowers for honey production',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 34,
+          title: 'Stabilizing sediments and jumpstarting coastal restoration efforts',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 35,
+          title: 'Recovering from extreme flooding',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 36,
+          title: 'Improving water quality',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 37,
+          title: 'Perceptions are consistent that marshes are better',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 38,
+          title: 'Recovery from hurricanes',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 39,
+          title: 'Supporting coastal fisheries',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 40,
+          title: 'Providing desirable views of the coast',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 41,
+          title: 'Reducing wind speeds',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 42,
+          title: 'Providing access to fishing areas',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 43,
+          title: 'Responding to sea level rise',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 44,
+          title: 'Perceptions of whether marshes or mangroves are better is consistently mixed',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 45,
+          title: 'Preventing coastal erosion',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 46,
+          title: 'Providing habitat for birds',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 47,
+          title: 'Perceptions of whether marshes or mangroves are better vary by location',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 48,
+          title: 'Protecting the coast during storms',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 49,
+          title: 'Supporting Layers',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8,
+          legendEnabled: false
+        },
+        {
+          id: 50,
+          title: 'Tidal Wetland Complexes',
           visible: false,
           intensity: undefined,
           opacity: 0.8
         },
-        { id: 5, title: 'Climate Modeling', visible: false, intensity: undefined, opacity: 0.8 },
+        {
+          id: 51,
+          title: 'Inland Wetland Migration Space',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8
+        },
         {
           id: 6,
-          title: 'Mangrove Presence - Recent Climate',
+          title: 'Mangrove Presence (Recent Climate)',
           visible: true,
           intensity: 'Current',
           opacity: 0.8
         },
         {
           id: 7,
-          title: 'Mangrove Presence - Moderate Climate Change',
+          title: 'Mangrove Presence (Future Moderate Climate)',
           visible: false,
           intensity: 'Moderate',
           opacity: 0.8
         },
         {
           id: 8,
-          title: 'Mangrove Presence - Severe Climate Change',
+          title: 'Mangrove Presence (Future Severe Climate)',
           visible: false,
           intensity: 'Intense',
           opacity: 0.8
         },
         {
           id: 9,
-          title: 'Mangrove Relative Abundance - Recent Climate',
+          title: 'Mangrove Relative Abundance (Recent Climate)',
           visible: false,
           intensity: 'Current',
           opacity: 0.8
         },
         {
           id: 10,
-          title: 'Mangrove Relative Abundance - Moderate Climate Change',
+          title: 'Mangrove Relative Abundance (Future Moderate Climate)',
           visible: false,
           intensity: 'Moderate',
           opacity: 0.8
         },
         {
           id: 11,
-          title: 'Mangrove Relative Abundance - Severe Climate Change',
+          title: 'Mangrove Relative Abundance (Future Severe Climate)',
           visible: false,
           intensity: 'Intense',
           opacity: 0.8
         },
         {
           id: 12,
-          title: 'Above Ground Biomass - Recent Climate',
+          title: 'Above Ground Biomass (Recent Climate)',
           visible: false,
           intensity: 'Current',
           opacity: 0.8
         },
         {
           id: 13,
-          title: 'Above Ground Biomass - Moderate Climate Change',
+          title: 'Above Ground Biomass (Future Moderate Climate)',
           visible: false,
           intensity: 'Moderate',
           opacity: 0.8
         },
         {
           id: 14,
-          title: 'Above Ground Biomass - Severe Climate Change',
+          title: 'Above Ground Biomass (Future Severe Climate)',
           visible: false,
           intensity: 'Intense',
           opacity: 0.8
         },
         {
           id: 15,
-          title: 'Wetland Vegetation Height - Recent Climate',
+          title: 'Wetland Vegetation Height (Recent Climate)',
           visible: false,
           intensity: 'Current',
           opacity: 0.8
         },
         {
           id: 16,
-          title: 'Wetland Vegetation Height - Moderate Climate Change',
+          title: 'Wetland Vegetation Height (Future Moderate Climate)',
           visible: false,
           intensity: 'Moderate',
           opacity: 0.8
         },
         {
           id: 17,
-          title: 'Wetland Vegetation Height - Severe Climate Change',
+          title: 'Wetland Vegetation Height (Future Severe Climate)',
           visible: false,
           intensity: 'Intense',
-          opacity: 0.8
-        },
-        {
-          id: 3,
-          title: 'Tidal Wetland Complexes',
-          visible: false,
-          intensity: undefined,
           opacity: 0.8
         }
       ]
     })
 
     esri.map.add(esri.mapImageLayer)
+
+    // get layer descriptions
+    //
+    //
+    //
+    //
+    //
+
+    // let obj = []
+    // let layDesc = []
+    // let smnum = this.$store.state.config.forLayerDescriptions.length
+    // console.log(smnum)
+    // let smcount = 0
+    // this.$store.state.config.forLayerDescriptions.forEach((service, index) => {
+    //   esriRequest(service.mapService + '/layers?f=pjson', {
+    //     responseType: 'json'
+    //   }).then(function (response) {
+    //     let layerJson = response.data.layers
+    //     //push main header to the object
+
+    //     obj.push({
+    //       label: service.title,
+    //       children: [],
+    //       id: 999 + index,
+    //       noTick: true,
+    //       type: 'header'
+    //     })
+
+    //     let storeNodes = []
+    //     let type = ''
+    //     layerJson.forEach((l) => {
+    //       service.popupTemplate.forEach((popup) => {
+    //         if (l.id == popup.id) {
+    //           type = 'Featue Layer'
+    //         } else type = 'Raster Layer'
+    //       })
+    //       // add layer to layer viewer if it's id is not present in the skip array
+    //       if (service.skipLayers.indexOf(l.id) == -1) {
+    //         // Group Layer with no parent
+    //         if (l.type == 'Group Layer' && !l.parentLayer) {
+    //           //push the object to the list as child of main header
+
+    //           obj[index].children.push({
+    //             label: l.name,
+    //             children: [],
+    //             id: l.id + '_' + index,
+    //             noTick: true,
+    //             type: type
+    //           })
+
+    //           //find the index of the object we just pushed, saves the reference to the location
+    //           let parentIndex = obj[index].children.findIndex((obj) => obj.id == l.id + '_' + index)
+    //           //save the parent node to the store with reference to its location in the object
+    //           storeNodes.push({
+    //             parentIndex: parentIndex,
+    //             parentLoc: obj[index].children[parentIndex],
+    //             parentId: l.id + '_' + index,
+    //             description: l.description
+    //               .replace('&lt;/a&gt;', '</a>')
+    //               .replace('&lt;a', '<a')
+    //               .replace('&lt;', '<')
+    //               .replace('&gt;', '>')
+    //           })
+    //         }
+    //         // featurel layer with parent
+    //         if (l.type !== 'Group Layer' && l.parentLayer) {
+    //           //find the location of the parent in the node lookup
+    //           let nodesIndex = storeNodes.findIndex(
+    //             (obj) => obj.parentId == l.parentLayer.id + '_' + index
+    //           )
+    //           //set the location of the parent
+    //           let parentLoc = storeNodes[nodesIndex].parentLoc
+    //           //push the child to the parent
+    //           parentLoc.children.push({
+    //             label: l.name,
+    //             children: [],
+    //             body: 'toggle',
+    //             id: l.id + '_' + index,
+    //             description: l.description
+    //               .replace('&lt;/a&gt;', '</a>')
+    //               .replace('&lt;a', '<a')
+    //               .replace('&lt;', '<')
+    //               .replace('&gt;', '>'),
+    //             type: type
+    //           })
+
+    //           console.log(this)
+
+    //           layDesc.push({
+    //             id: l.id,
+    //             title: l.name,
+    //             description: l.description
+    //               .replace('&lt;/a&gt;', '</a>')
+    //               .replace('&lt;a', '<a')
+    //               .replace('&lt;', '<')
+    //               .replace('&gt;', '>')
+    //           })
+
+    //           console.log(layDesc)
+    //         }
+    //         // group layer with parent
+    //         if (l.type == 'Group Layer' && l.parentLayer) {
+    //           //find the location of the parent in the node lookup
+    //           let nodesIndex = storeNodes.findIndex(
+    //             (obj) => obj.parentId == l.parentLayer.id + '_' + index
+    //           )
+    //           //set the location of the parent
+    //           let parentLoc = storeNodes[nodesIndex].parentLoc
+    //           //push the new parent into the found parent as child
+
+    //           parentLoc.children.push({
+    //             label: l.name,
+    //             children: [],
+    //             id: l.id + '_' + index,
+    //             noTick: true,
+    //             type: type
+    //           })
+
+    //           //find the index of the child we just pushed
+    //           let parentIndex = parentLoc.children.findIndex((obj) => obj.id == l.id + '_' + index)
+    //           //save the reference to the location
+    //           parentLoc = parentLoc.children[parentIndex]
+    //           //save the parent node to the store with reference to its location in the object
+    //           storeNodes.push({
+    //             parentIndex: parentIndex,
+    //             parentLoc: parentLoc,
+    //             parentId: l.id + '_' + index,
+    //             description: l.description
+    //               .replace('&lt;/a&gt;', '</a>')
+    //               .replace('&lt;a', '<a')
+    //               .replace('&lt;', '<')
+    //               .replace('&gt;', '>')
+    //           })
+    //         }
+    //         // feature layer with no parent length = number of nodes
+    //         if (l.type !== 'Group Layer' && !l.parentLayer) {
+    //           obj[index].children.push({
+    //             label: l.name,
+    //             children: [],
+    //             body: 'toggle',
+    //             id: l.id + '_' + index,
+    //             description: l.description
+    //               .replace('&lt;/a&gt;', '</a>')
+    //               .replace('&lt;a', '<a')
+    //               .replace('&lt;', '<')
+    //               .replace('&gt;', '>'),
+    //             type: type
+    //           })
+    //         }
+    //       }
+    //     })
+    //     smcount = smcount + 1
+    //     // console.log(smcount)
+    //     // console.log(smnum)
+    //   })
+    // })
+
+    // // this.layerDescriptions = layDesc
+    // console.log(this.layerDescriptions)
+
+    //
+    //
+    //
+    //
+    //
+    //
   },
 
   methods: {
@@ -841,12 +1307,16 @@ export default {
     },
 
     updateMangroveLayerVis(type, intensity) {
+      if (this.layerSelection == []) {
+        console.log('no layer selected')
+      }
+
       if (this.previousMangroveLayer !== '') {
         esri.mapImageLayer.findSublayerById(this.previousMangroveLayer).visible = false
       }
 
       esri.mapImageLayer.sublayers.forEach((layer) => {
-        if (layer.title.includes(type) == true) {
+        if (layer.title.includes(type) == true && layer.id !== 1) {
           if (layer.intensity == intensity) {
             this.previousMangroveLayer = layer.id
             layer.visible = true
@@ -862,6 +1332,9 @@ export default {
         if (layer.id == 1 || layer.id == 2 || layer.id == 3 || layer.id == 4) {
           if (array.includes(layer.title) == true) {
             layer.visible = true
+
+            // console.log(layer.layer)
+            console.log(this.layerDescriptions)
           } else {
             layer.visible = false
           }
@@ -896,14 +1369,145 @@ export default {
 
     updateSocialLayerVis(title) {
       esri.mapImageLayer.sublayers.forEach((layer) => {
-        if (layer.id >= 26) {
-          if (layer.title.includes(title) == true) {
+        if (layer.id >= 24) {
+          if (layer.title === title) {
             layer.visible = true
           } else {
             layer.visible = false
           }
         }
       })
+
+      if (
+        title == 'What do people think is driving mangrove change in expansion areas?' ||
+        title ==
+          'What actions do people think need to be taken for mangroves in expansion areas?' ||
+        title ==
+          'How do people in mangrove expansion areas perceive the benefits provided by marshes versus mangroves?'
+      ) {
+        esri.lgExpand.collapse()
+        esri.socialExpand.visible = true
+        esri.socialExpand.expand()
+      } else {
+        esri.lgExpand.expand()
+        esri.socialExpand.visible = false
+        esri.socialExpand.collapse()
+      }
+    },
+
+    updateSubSocialLayerVis(question) {
+      function zoomToFeaturesExtent(features) {
+        var combinedExtent = geometryEngine.union(features.map((feature) => feature.geometry))
+        view.goTo(combinedExtent)
+      }
+
+      let percepMang = [31, 32, 33, 34, 35, 36]
+      let percepMarsh = [38, 39, 40, 41, 42, 43]
+      let percepMixed = [45, 46]
+      let percepVary = [48]
+
+      console.log(question)
+
+      esri.lgExpand.collapse()
+      esri.socialExpand.visible = true
+      esri.socialExpand.expand()
+
+      if (question !== undefined) {
+        esri.mapView.goTo({
+          center: [-90.213542, 26.58333],
+          zoom: 6
+        })
+
+        this.subLegendInfo = true
+        // Insert queries for these layers
+        // for feature layer queries, use dynamic solution. esri.socialContent = esri.findsublayerbyid(questionSublayerID) & esri.socialContent.queryFeatures
+        if (question == 'Perceptions are consistent that mangroves are better') {
+          percepMang.forEach((layer) => {
+            esri.mapImageLayer.findSublayerById(layer).visible = true
+          })
+          percepMarsh.forEach((layer) => {
+            esri.mapImageLayer.findSublayerById(layer).visible = false
+          })
+          percepMixed.forEach((layer) => {
+            esri.mapImageLayer.findSublayerById(layer).visible = false
+          })
+          percepVary.forEach((layer) => {
+            esri.mapImageLayer.findSublayerById(layer).visible = false
+          })
+
+          // featureLayer.queryFeatures(query).then(function (results) {
+          //   const features = results.features
+          //   zoomToFeaturesExtent(features)
+          // })
+        } else if (question == 'Perceptions are consistent that marshes are better') {
+          percepMarsh.forEach((layer) => {
+            esri.mapImageLayer.findSublayerById(layer).visible = true
+          })
+          percepMang.forEach((layer) => {
+            esri.mapImageLayer.findSublayerById(layer).visible = false
+          })
+          percepMixed.forEach((layer) => {
+            esri.mapImageLayer.findSublayerById(layer).visible = false
+          })
+          percepVary.forEach((layer) => {
+            esri.mapImageLayer.findSublayerById(layer).visible = false
+          })
+        } else if (
+          question == 'Perceptions of whether marshes or mangroves are better is consistently mixed'
+        ) {
+          percepMixed.forEach((layer) => {
+            esri.mapImageLayer.findSublayerById(layer).visible = true
+          })
+          percepMang.forEach((layer) => {
+            esri.mapImageLayer.findSublayerById(layer).visible = false
+          })
+          percepMarsh.forEach((layer) => {
+            esri.mapImageLayer.findSublayerById(layer).visible = false
+          })
+          percepVary.forEach((layer) => {
+            esri.mapImageLayer.findSublayerById(layer).visible = false
+          })
+        } else if (
+          question == 'Perceptions of whether marshes or mangroves are better vary by location'
+        ) {
+          percepVary.forEach((layer) => {
+            esri.mapImageLayer.findSublayerById(layer).visible = true
+          })
+          percepMang.forEach((layer) => {
+            esri.mapImageLayer.findSublayerById(layer).visible = false
+          })
+          percepMarsh.forEach((layer) => {
+            esri.mapImageLayer.findSublayerById(layer).visible = false
+          })
+          percepMixed.forEach((layer) => {
+            esri.mapImageLayer.findSublayerById(layer).visible = false
+          })
+        }
+      } else if (question == undefined || question == '') {
+        this.subLegendInfo = false
+
+        esri.lgExpand.expand()
+        esri.socialExpand.visible = false
+        esri.socialExpand.collapse()
+
+        percepMang.forEach((layer) => {
+          esri.mapImageLayer.findSublayerById(layer).visible = false
+        })
+        percepMarsh.forEach((layer) => {
+          esri.mapImageLayer.findSublayerById(layer).visible = false
+        })
+        percepMixed.forEach((layer) => {
+          esri.mapImageLayer.findSublayerById(layer).visible = false
+        })
+        percepVary.forEach((layer) => {
+          esri.mapImageLayer.findSublayerById(layer).visible = false
+        })
+
+        esri.mapView.goTo({
+          center: [-88.900345, 29.222555],
+          zoom: 5
+        })
+      }
     },
 
     updateIntensity(sliderVal) {
@@ -914,13 +1518,167 @@ export default {
       } else if (sliderVal == 2) {
         this.intensity = 'Intense'
       }
+    },
+
+    getDescriptions() {
+      let obj = []
+      let layDesc = []
+      let smnum = this.$store.state.config.forLayerDescriptions.length
+      console.log(smnum)
+      let smcount = 0
+      this.$store.state.config.forLayerDescriptions.forEach((service, index) => {
+        esriRequest(service.mapService + '/layers?f=pjson', {
+          responseType: 'json'
+        }).then(function (response) {
+          let layerJson = response.data.layers
+          //push main header to the object
+
+          obj.push({
+            label: service.title,
+            children: [],
+            id: 999 + index,
+            noTick: true,
+            type: 'header'
+          })
+
+          let storeNodes = []
+          let type = ''
+          layerJson.forEach((l) => {
+            service.popupTemplate.forEach((popup) => {
+              if (l.id == popup.id) {
+                type = 'Featue Layer'
+              } else type = 'Raster Layer'
+            })
+            // add layer to layer viewer if it's id is not present in the skip array
+            if (service.skipLayers.indexOf(l.id) == -1) {
+              // Group Layer with no parent
+              if (l.type == 'Group Layer' && !l.parentLayer) {
+                //push the object to the list as child of main header
+
+                obj[index].children.push({
+                  label: l.name,
+                  children: [],
+                  id: l.id + '_' + index,
+                  noTick: true,
+                  type: type
+                })
+
+                //find the index of the object we just pushed, saves the reference to the location
+                let parentIndex = obj[index].children.findIndex(
+                  (obj) => obj.id == l.id + '_' + index
+                )
+                //save the parent node to the store with reference to its location in the object
+                storeNodes.push({
+                  parentIndex: parentIndex,
+                  parentLoc: obj[index].children[parentIndex],
+                  parentId: l.id + '_' + index,
+                  description: l.description
+                    .replace('&lt;/a&gt;', '</a>')
+                    .replace('&lt;a', '<a')
+                    .replace('&lt;', '<')
+                    .replace('&gt;', '>')
+                })
+              }
+              // featurel layer with parent
+              if (l.type !== 'Group Layer' && l.parentLayer) {
+                //find the location of the parent in the node lookup
+                let nodesIndex = storeNodes.findIndex(
+                  (obj) => obj.parentId == l.parentLayer.id + '_' + index
+                )
+                //set the location of the parent
+                let parentLoc = storeNodes[nodesIndex].parentLoc
+                //push the child to the parent
+                parentLoc.children.push({
+                  label: l.name,
+                  children: [],
+                  body: 'toggle',
+                  id: l.id + '_' + index,
+                  description: l.description
+                    .replace('&lt;/a&gt;', '</a>')
+                    .replace('&lt;a', '<a')
+                    .replace('&lt;', '<')
+                    .replace('&gt;', '>'),
+                  type: type
+                })
+
+                layDesc.push({
+                  id: l.id,
+                  title: l.name,
+                  description: l.description
+                    .replace('&lt;/a&gt;', '</a>')
+                    .replace('&lt;a', '<a')
+                    .replace('&lt;', '<')
+                    .replace('&gt;', '>')
+                })
+              }
+              // group layer with parent
+              if (l.type == 'Group Layer' && l.parentLayer) {
+                //find the location of the parent in the node lookup
+                let nodesIndex = storeNodes.findIndex(
+                  (obj) => obj.parentId == l.parentLayer.id + '_' + index
+                )
+                //set the location of the parent
+                let parentLoc = storeNodes[nodesIndex].parentLoc
+                //push the new parent into the found parent as child
+
+                parentLoc.children.push({
+                  label: l.name,
+                  children: [],
+                  id: l.id + '_' + index,
+                  noTick: true,
+                  type: type
+                })
+
+                //find the index of the child we just pushed
+                let parentIndex = parentLoc.children.findIndex(
+                  (obj) => obj.id == l.id + '_' + index
+                )
+                //save the reference to the location
+                parentLoc = parentLoc.children[parentIndex]
+                //save the parent node to the store with reference to its location in the object
+                storeNodes.push({
+                  parentIndex: parentIndex,
+                  parentLoc: parentLoc,
+                  parentId: l.id + '_' + index,
+                  description: l.description
+                    .replace('&lt;/a&gt;', '</a>')
+                    .replace('&lt;a', '<a')
+                    .replace('&lt;', '<')
+                    .replace('&gt;', '>')
+                })
+              }
+              // feature layer with no parent length = number of nodes
+              if (l.type !== 'Group Layer' && !l.parentLayer) {
+                obj[index].children.push({
+                  label: l.name,
+                  children: [],
+                  body: 'toggle',
+                  id: l.id + '_' + index,
+                  description: l.description
+                    .replace('&lt;/a&gt;', '</a>')
+                    .replace('&lt;a', '<a')
+                    .replace('&lt;', '<')
+                    .replace('&gt;', '>'),
+                  type: type
+                })
+              }
+            }
+          })
+          smcount = smcount + 1
+          // console.log(smcount)
+          // console.log(smnum)
+        })
+      })
+      console.log(layDesc)
+      this.layerDescriptions = layDesc
+      console.log(this.layerDescriptions)
     }
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style>
 @import 'https://js.arcgis.com/4.20/@arcgis/core/assets/esri/themes/light/main.css';
 
 #map {
@@ -938,6 +1696,10 @@ export default {
   width: 100%;
   position: relative;
   border-bottom: #999 solid 1pt;
+}
+.esri-legend__layer-cell.esri-legend__layer-cell--info {
+  width: 300px !important;
+  max-width: 300px !important;
 }
 
 @media screen and (max-width: 700px) {
@@ -1011,5 +1773,30 @@ esri-expand__content esri-expand__content--expanded div {
 
 .esri-scale-bar__line {
   background-color: white !important;
+}
+
+#socialContainer .esri-expand-panel {
+  display: none;
+}
+
+div[title='Supporting Layers' i] {
+  width: 140px;
+  height: 35px;
+}
+
+div[title='Supporting Layers' i] .esri-collapse__icon {
+  display: none;
+}
+
+div[title='Supporting Layers' i] .esri-icon-font-fallback-text {
+  width: auto;
+  height: 13px;
+  clip: auto;
+  font-size: 13px;
+  font-family: arial !important;
+}
+#expand-widget-id {
+  display: none !important;
+  background-color: red;
 }
 </style>

@@ -138,6 +138,7 @@ export default {
     loginUser() {
       if (this.password == 'Mangrove') {
         this.showHelp = false
+        this.descriptionsComplete = true
       }
     },
     setUserChoice() {
@@ -145,6 +146,17 @@ export default {
         localStorage.userHideDialogOptionMeramac = 'true'
         this.showUserOption = false
         this.persistent = false
+      }
+    }
+  },
+
+  computed: {
+    descriptionsComplete: {
+      get() {
+        return this.$store.state.descriptionsComplete
+      },
+      set(value) {
+        this.$store.commit('updateDescriptionsComplete', value)
       }
     }
   }
