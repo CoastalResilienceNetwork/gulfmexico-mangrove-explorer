@@ -33,7 +33,7 @@
         <div v-for="desc in this.layerDescriptions" :key="desc">
           <div v-if="option.showDesc == true">
             <div v-if="desc.title.includes(option.value) == true || desc.title == option.label">
-              <div v-html="desc.description" style="font-size: small"></div>
+              <div v-html="desc.description" style=""></div>
             </div>
           </div>
         </div>
@@ -93,10 +93,10 @@
           @hide-resource="option.showDesc = false"
           style="margin: 5px"
         ></icon-button>
-        <div v-for="desc in this.layerDescriptions" :key="desc">
-          <div v-if="option.showDesc == true">
-            <div v-if="desc.title.includes(option.value) == true || desc.title == option.label">
-              <div v-html="desc.description" style="font-size: small"></div>
+        <div v-if="option.showDesc == true">
+          <div v-for="desc in this.layerDescriptions" :key="desc">
+            <div v-if="desc.title.includes(option.value + ' ' + this.intensity) == true">
+              <p v-html="desc.description" style="font-size: small"></p>
             </div>
           </div>
         </div>
@@ -156,7 +156,7 @@
       <div class="q-mx-lg q-my-sm">
         <div style="display: flex">
           <p style="text-decoration: underline; margin-bottom: 0px">Community Survey Data</p>
-          <icon-button
+          <!-- <icon-button
             v-if="!this.showInfo"
             type="info"
             method="show-resource"
@@ -169,9 +169,13 @@
             method="hide-resource"
             @hide-resource="this.showInfo = false"
             style="margin: 5px"
-          ></icon-button>
+          ></icon-button> -->
         </div>
-        <div v-if="this.showInfo == true">Test content for info button.</div>
+        <div>
+          We surveyed four communities Corpus Christi, Galveston, Panama City Beach and Cedar Key,
+          to investigate the opinions of coastal residents about the expansion of mangroves in the
+          Gulf Coast and in their location.
+        </div>
       </div>
       <div v-for="option in socialOptions" :key="option" class="q-mx-lg">
         <q-checkbox
@@ -314,7 +318,8 @@ export default {
         { value: 1, label: 'Future Moderate' },
         { value: 2, label: 'Future Severe', style: { width: '30%' } }
       ],
-      showInfo: false
+      showInfo: false,
+      intensity: '(Recent Climate)'
     }
   },
   computed: {
@@ -378,7 +383,22 @@ export default {
       return this.$store.state.layerDescriptions
     }
   },
-  methods: {}
+  methods: {
+    changeIntensity(value) {
+      if (value == 0) {
+        this.intensity = '(Recent Climate)'
+      } else if (value == 1) {
+        this.intensity = '(Future Moderate Climate)'
+      } else if (value == 2) {
+        this.intensity = '(Future Severe Climate)'
+      }
+    }
+  },
+  watch: {
+    sliderValue() {
+      this.changeIntensity(this.sliderValue)
+    }
+  }
 }
 </script>
 

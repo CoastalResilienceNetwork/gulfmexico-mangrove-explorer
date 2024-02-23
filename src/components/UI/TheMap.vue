@@ -6,23 +6,23 @@
     <div id="legendContainer" style="width: 20vw; display: flex; margin: 0px !important"></div>
     <div
       id="socialContainer"
-      style="width: 50vw; height: 38vh; border: 5px grey solid; border-radius: 4px"
+      style="width: 50vw; height: 38vh; border: 5px grey solid; border-radius: 2px"
     >
       <img
-        src="../../assets/legend.png"
-        height="90%"
-        width="auto"
+        src="../../assets/surveyQ1.jpg"
+        height="100%"
+        width="100%"
         style="margin-top: auto; margin-bottom: auto; display: block"
       />
-      <q-btn
+      <!-- <q-btn
         width="100px"
         height="100px"
         color="red"
         style="float: right; position: absolute; bottom: 5px; right: 5px; border-radius: 0px"
         icon-right="fas fa-arrow-right"
         label="1 of 5"
-      >
-      </q-btn>
+      > -->
+      <!-- </q-btn> -->
     </div>
   </div>
 </template>
@@ -238,6 +238,7 @@ export default {
       this.updateMangroveLayerVis(this.layerSelection[0], this.intensity)
     },
     sliderValue() {
+      console.log(this.sliderValue)
       this.updateIntensity(this.sliderValue)
       this.updateMangroveLayerVis(this.layerSelection[0], this.intensity)
       this.updateClimaticLayerVis(this.climaticSelection[0], this.intensity)
@@ -881,172 +882,6 @@ export default {
     })
 
     esri.map.add(esri.mapImageLayer)
-
-    // get layer descriptions
-    //
-    //
-    //
-    //
-    //
-
-    // let obj = []
-    // let layDesc = []
-    // let smnum = this.$store.state.config.forLayerDescriptions.length
-    // console.log(smnum)
-    // let smcount = 0
-    // this.$store.state.config.forLayerDescriptions.forEach((service, index) => {
-    //   esriRequest(service.mapService + '/layers?f=pjson', {
-    //     responseType: 'json'
-    //   }).then(function (response) {
-    //     let layerJson = response.data.layers
-    //     //push main header to the object
-
-    //     obj.push({
-    //       label: service.title,
-    //       children: [],
-    //       id: 999 + index,
-    //       noTick: true,
-    //       type: 'header'
-    //     })
-
-    //     let storeNodes = []
-    //     let type = ''
-    //     layerJson.forEach((l) => {
-    //       service.popupTemplate.forEach((popup) => {
-    //         if (l.id == popup.id) {
-    //           type = 'Featue Layer'
-    //         } else type = 'Raster Layer'
-    //       })
-    //       // add layer to layer viewer if it's id is not present in the skip array
-    //       if (service.skipLayers.indexOf(l.id) == -1) {
-    //         // Group Layer with no parent
-    //         if (l.type == 'Group Layer' && !l.parentLayer) {
-    //           //push the object to the list as child of main header
-
-    //           obj[index].children.push({
-    //             label: l.name,
-    //             children: [],
-    //             id: l.id + '_' + index,
-    //             noTick: true,
-    //             type: type
-    //           })
-
-    //           //find the index of the object we just pushed, saves the reference to the location
-    //           let parentIndex = obj[index].children.findIndex((obj) => obj.id == l.id + '_' + index)
-    //           //save the parent node to the store with reference to its location in the object
-    //           storeNodes.push({
-    //             parentIndex: parentIndex,
-    //             parentLoc: obj[index].children[parentIndex],
-    //             parentId: l.id + '_' + index,
-    //             description: l.description
-    //               .replace('&lt;/a&gt;', '</a>')
-    //               .replace('&lt;a', '<a')
-    //               .replace('&lt;', '<')
-    //               .replace('&gt;', '>')
-    //           })
-    //         }
-    //         // featurel layer with parent
-    //         if (l.type !== 'Group Layer' && l.parentLayer) {
-    //           //find the location of the parent in the node lookup
-    //           let nodesIndex = storeNodes.findIndex(
-    //             (obj) => obj.parentId == l.parentLayer.id + '_' + index
-    //           )
-    //           //set the location of the parent
-    //           let parentLoc = storeNodes[nodesIndex].parentLoc
-    //           //push the child to the parent
-    //           parentLoc.children.push({
-    //             label: l.name,
-    //             children: [],
-    //             body: 'toggle',
-    //             id: l.id + '_' + index,
-    //             description: l.description
-    //               .replace('&lt;/a&gt;', '</a>')
-    //               .replace('&lt;a', '<a')
-    //               .replace('&lt;', '<')
-    //               .replace('&gt;', '>'),
-    //             type: type
-    //           })
-
-    //           console.log(this)
-
-    //           layDesc.push({
-    //             id: l.id,
-    //             title: l.name,
-    //             description: l.description
-    //               .replace('&lt;/a&gt;', '</a>')
-    //               .replace('&lt;a', '<a')
-    //               .replace('&lt;', '<')
-    //               .replace('&gt;', '>')
-    //           })
-
-    //           console.log(layDesc)
-    //         }
-    //         // group layer with parent
-    //         if (l.type == 'Group Layer' && l.parentLayer) {
-    //           //find the location of the parent in the node lookup
-    //           let nodesIndex = storeNodes.findIndex(
-    //             (obj) => obj.parentId == l.parentLayer.id + '_' + index
-    //           )
-    //           //set the location of the parent
-    //           let parentLoc = storeNodes[nodesIndex].parentLoc
-    //           //push the new parent into the found parent as child
-
-    //           parentLoc.children.push({
-    //             label: l.name,
-    //             children: [],
-    //             id: l.id + '_' + index,
-    //             noTick: true,
-    //             type: type
-    //           })
-
-    //           //find the index of the child we just pushed
-    //           let parentIndex = parentLoc.children.findIndex((obj) => obj.id == l.id + '_' + index)
-    //           //save the reference to the location
-    //           parentLoc = parentLoc.children[parentIndex]
-    //           //save the parent node to the store with reference to its location in the object
-    //           storeNodes.push({
-    //             parentIndex: parentIndex,
-    //             parentLoc: parentLoc,
-    //             parentId: l.id + '_' + index,
-    //             description: l.description
-    //               .replace('&lt;/a&gt;', '</a>')
-    //               .replace('&lt;a', '<a')
-    //               .replace('&lt;', '<')
-    //               .replace('&gt;', '>')
-    //           })
-    //         }
-    //         // feature layer with no parent length = number of nodes
-    //         if (l.type !== 'Group Layer' && !l.parentLayer) {
-    //           obj[index].children.push({
-    //             label: l.name,
-    //             children: [],
-    //             body: 'toggle',
-    //             id: l.id + '_' + index,
-    //             description: l.description
-    //               .replace('&lt;/a&gt;', '</a>')
-    //               .replace('&lt;a', '<a')
-    //               .replace('&lt;', '<')
-    //               .replace('&gt;', '>'),
-    //             type: type
-    //           })
-    //         }
-    //       }
-    //     })
-    //     smcount = smcount + 1
-    //     // console.log(smcount)
-    //     // console.log(smnum)
-    //   })
-    // })
-
-    // // this.layerDescriptions = layDesc
-    // console.log(this.layerDescriptions)
-
-    //
-    //
-    //
-    //
-    //
-    //
   },
 
   methods: {
@@ -1388,6 +1223,10 @@ export default {
         esri.lgExpand.collapse()
         esri.socialExpand.visible = true
         esri.socialExpand.expand()
+        esri.mapView.goTo({
+          center: [-90.213542, 26.58333],
+          zoom: 6
+        })
       } else {
         esri.lgExpand.expand()
         esri.socialExpand.visible = false
@@ -1408,11 +1247,11 @@ export default {
 
       console.log(question)
 
-      esri.lgExpand.collapse()
-      esri.socialExpand.visible = true
-      esri.socialExpand.expand()
-
       if (question !== undefined) {
+        esri.lgExpand.collapse()
+        esri.socialExpand.visible = true
+        esri.socialExpand.expand()
+
         esri.mapView.goTo({
           center: [-90.213542, 26.58333],
           zoom: 6
@@ -1609,6 +1448,7 @@ export default {
                     .replace('&lt;a', '<a')
                     .replace('&lt;', '<')
                     .replace('&gt;', '>')
+                    .replace('STYLE="text-align:Left;font-size:12pt"', '')
                 })
               }
               // group layer with parent
@@ -1798,5 +1638,8 @@ div[title='Supporting Layers' i] .esri-icon-font-fallback-text {
 #expand-widget-id {
   display: none !important;
   background-color: red;
+}
+#socialContainer .esri-widget--button {
+  display: none !important;
 }
 </style>

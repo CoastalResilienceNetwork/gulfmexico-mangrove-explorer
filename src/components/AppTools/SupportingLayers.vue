@@ -138,25 +138,25 @@ export default {
   },
 
   watch: {
-    ticked() {
-      //get type and create ticked object with layer id and layer type to retrieve in map
-      let tickedObj = []
-      this.ticked.forEach((layer) => {
-        let node = this.$refs.tree.getNodeByKey(layer)
-        let type = node.type
-        let layerInfo = layer.split('_')
-        tickedObj.push({
-          mapServiceIndex: layerInfo[1],
-          id: layerInfo[0],
-          type: type
-        })
-      })
-      this.$store.commit('updateTreeState', {
-        tickedObj: tickedObj,
-        ticked: this.ticked,
-        expanded: this.expanded
-      })
-    },
+    // ticked() {
+    //   //get type and create ticked object with layer id and layer type to retrieve in map
+    //   let tickedObj = []
+    //   this.ticked.forEach((layer) => {
+    //     let node = this.$refs.tree.getNodeByKey(layer)
+    //     let type = node.type
+    //     let layerInfo = layer.split('_')
+    //     tickedObj.push({
+    //       mapServiceIndex: layerInfo[1],
+    //       id: layerInfo[0],
+    //       type: type
+    //     })
+    //   })
+    //   this.$store.commit('updateTreeState', {
+    //     tickedObj: tickedObj,
+    //     ticked: this.ticked,
+    //     expanded: this.expanded
+    //   })
+    // },
     slReady() {
       if (this.slReady) {
         this.treeData = this.$store.state.data.supportingLayers
