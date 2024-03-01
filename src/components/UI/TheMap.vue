@@ -905,12 +905,16 @@ export default {
       // turn off all raster layer visibility
       esri.map.layers.items.forEach((fl) => {
         if (fl.type === 'feature') {
-          fl.visible = false
+          if (fl.id == 30 || fl.id == 31) {
+            fl.visible = false
+          }
         }
         if (fl.type == 'map-image') {
           fl.allSublayers.items.forEach((sl) => {
             if (sl.layer.type == 'map-image') {
-              sl.visible = false
+              if (sl.id == 30 || sl.id == 31) {
+                sl.visible = false
+              }
             }
           })
         }
@@ -919,7 +923,6 @@ export default {
       this.supportingMapVisibleLayers.forEach((l) => {
         //if type is raster layer - find the sublayer and make visible
         if (l.type === 'Raster Layer') {
-          console.log(l)
           let layer = esri.map.layers.items.find((layer) => {
             return (
               layer.type == 'map-image' &&
@@ -1402,7 +1405,6 @@ export default {
       let obj = []
       let layDesc = []
       let smnum = this.$store.state.config.forLayerDescriptions.length
-      console.log(smnum)
       let smcount = 0
       this.$store.state.config.forLayerDescriptions.forEach((service, index) => {
         esriRequest(service.mapService + '/layers?f=pjson', {
@@ -1548,9 +1550,7 @@ export default {
           // console.log(smnum)
         })
       })
-      console.log(layDesc)
       this.layerDescriptions = layDesc
-      console.log(this.layerDescriptions)
     }
   }
 }
