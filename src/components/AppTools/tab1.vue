@@ -13,7 +13,6 @@
           :val="option.value"
           :label="option.label"
           toggle-order="tf"
-          @update:model-value="this.supportingSelection = this.supportingSelection.slice(-1)"
         ></q-checkbox>
 
         <icon-button
@@ -33,7 +32,7 @@
         <div v-for="desc in this.layerDescriptions" :key="desc">
           <div v-if="option.showDesc == true">
             <div v-if="desc.title.includes(option.value) == true || desc.title == option.label">
-              <div v-html="desc.description" style=""></div>
+              <div v-html="desc.description" style="font-size: small"></div>
             </div>
           </div>
         </div>
@@ -44,6 +43,7 @@
   <div>
     <q-expansion-item
       label="Modeling Current and Future Mangroves"
+      default-opened
       dense
       :header-style="{ textAlign: 'center', fontWeight: 'bold' }"
     >
@@ -51,7 +51,50 @@
         v-if="this.layerSelection !== '' || this.climaticSelection !== 'None'"
         style="background-color: rgb(25, 25, 25, 0.1); border-radius: 3px"
       >
-        <p class="q-mx-lg q-my-sm" style="text-decoration: underline">Select Climate Scenario</p>
+        <div class="q-mx-lg q-my-sm">
+          <div style="display: flex; margin: auto; width: fit-content">
+            <p style="text-decoration: underline">
+              <i>Climate change intensity over time</i>
+            </p>
+            <icon-button
+              v-if="!this.showInfo"
+              type="info"
+              method="show-resource"
+              @show-resource="this.showInfo = true"
+              style="margin: 5px"
+            ></icon-button>
+            <icon-button
+              v-if="this.showInfo"
+              type="close"
+              method="hide-resource"
+              @hide-resource="this.showInfo = false"
+              style="margin: 5px"
+            ></icon-button>
+          </div>
+          <div v-if="this.showInfo == true">
+            <p style="font-size: small">
+              Warming winter temperatures due to global climate change are expected to enable the
+              range expansion of freeze-sensitive mangrove plants at the expense of freeze-tolerant
+              salt marsh plants. The transition from grass-dominated marshes to woody-plant
+              dominated mangrove forests has the potential to impact some of the ecosystem goods and
+              services provided by coastal wetlands.<br />
+              Here, we estimated changes in mangrove distribution and coastal wetland vegetation
+              structure in the southeastern United States using known climate-ecological
+              relationships, recent climate data for the period 1981-2010, and future projected
+              climate data for the period 2071-2100. We quantified potential changes in mangrove
+              presence, mangrove relative abundance, coastal wetland vegetation height, and coastal
+              wetland vegetation aboveground biomass under two
+              <a
+                href="https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WGI_Chapter04.pdf"
+                target="_blank"
+                >Shared Socio-economic Pathway scenarios:</a
+              >
+              a future with moderate climate change (SSP2-4.5) and a future with severe climate
+              change (SSP5-8.5), which correspond to intermediate and high greenhouse gas emissions
+              scenarios, respectively.
+            </p>
+          </div>
+        </div>
 
         <q-slider
           v-model="this.sliderValue"
@@ -68,7 +111,47 @@
           "
         />
       </div>
-      <p class="q-mx-lg q-my-sm" style="text-decoration: underline">Mangrove Data</p>
+      <p class="q-mx-lg q-my-sm" style="text-decoration: underline">
+        Climatic Drivers of Mangrove Change
+      </p>
+      <div v-for="option in climaticOptions" :key="option" class="q-mx-lg">
+        <q-checkbox
+          size="sm"
+          v-model="this.climaticSelection"
+          :val="option.value"
+          :label="option.label"
+          toggle-order="tf"
+          @update:model-value="this.climaticSelection = this.climaticSelection.slice(-1)"
+        ></q-checkbox>
+
+        <icon-button
+          v-if="!option.showDesc"
+          type="info"
+          method="show-resource"
+          @show-resource="option.showDesc = true"
+          style="margin: 5px"
+        ></icon-button>
+        <icon-button
+          v-if="option.showDesc"
+          type="close"
+          method="hide-resource"
+          @hide-resource="option.showDesc = false"
+          style="margin: 5px"
+        ></icon-button>
+        <div v-for="desc in this.layerDescriptions" :key="desc">
+          <div v-if="option.showDesc == true">
+            <div
+              v-if="
+                desc.title.includes(option.value + ' ' + this.intensity) == true ||
+                desc.title == option.label
+              "
+            >
+              <div v-html="desc.description" style="font-size: small"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="q-mx-lg q-my-sm" style="text-decoration: underline">Current and Future Mangroves</p>
       <div v-for="option in layerOptions" :key="option" class="q-mx-lg">
         <q-checkbox
           size="sm"
@@ -101,15 +184,30 @@
           </div>
         </div>
       </div>
-      <p class="q-mx-lg q-my-sm" style="text-decoration: underline">Climatic Drivers</p>
-      <div v-for="option in climaticOptions" :key="option" class="q-mx-lg">
+    </q-expansion-item>
+  </div>
+  <hr />
+  <div>
+    <q-expansion-item
+      label="Policy and Social Context"
+      default-opened
+      dense
+      :header-style="{ textAlign: 'center', fontWeight: 'bold' }"
+    >
+      <div class="q-mx-lg q-my-sm">
+        <div>
+          We researched mangrove specific policies in each state to determine which Gulf of Mexico
+          and Southeast US States explicitly protect mangroves from being destroyed or removed.
+        </div>
+      </div>
+      <div v-for="option in stateLawLayer" :key="option" class="q-mx-lg">
         <q-checkbox
           size="sm"
-          v-model="this.climaticSelection"
+          v-model="this.socialSelection"
           :val="option.value"
           :label="option.label"
           toggle-order="tf"
-          @update:model-value="this.climaticSelection = this.climaticSelection.slice(-1)"
+          @update:model-value="this.socialSelection = this.socialSelection.slice(-1)"
         ></q-checkbox>
 
         <icon-button
@@ -126,36 +224,16 @@
           @hide-resource="option.showDesc = false"
           style="margin: 5px"
         ></icon-button>
-        <div v-for="desc in this.layerDescriptions" :key="desc">
-          <div v-if="option.showDesc == true">
-            <div v-if="desc.title.includes(option.value) == true || desc.title == option.label">
-              <div v-html="desc.description" style="font-size: small"></div>
+        <div v-if="option.showDesc == true">
+          <div v-for="desc in this.layerDescriptions" :key="desc">
+            <div v-if="desc.title.includes(option.value) == true">
+              <p v-html="desc.description" style="font-size: small"></p>
             </div>
           </div>
         </div>
       </div>
-    </q-expansion-item>
-  </div>
-  <hr />
-  <div>
-    <q-expansion-item
-      label="Policy and Social Context"
-      dense
-      :header-style="{ textAlign: 'center', fontWeight: 'bold' }"
-    >
-      <div v-for="option in stateLawLayer" :key="option" class="q-mx-lg">
-        <q-checkbox
-          size="sm"
-          v-model="this.socialSelection"
-          :val="option.value"
-          :label="option.label"
-          toggle-order="tf"
-          @update:model-value="this.socialSelection = this.socialSelection.slice(-1)"
-        ></q-checkbox>
-      </div>
       <div class="q-mx-lg q-my-sm">
         <div style="display: flex">
-          <p style="text-decoration: underline; margin-bottom: 0px">Community Survey Data</p>
           <!-- <icon-button
             v-if="!this.showInfo"
             type="info"
@@ -172,9 +250,9 @@
           ></icon-button> -->
         </div>
         <div>
-          We surveyed four communities Corpus Christi, Galveston, Panama City Beach and Cedar Key,
-          to investigate the opinions of coastal residents about the expansion of mangroves in the
-          Gulf Coast and in their location.
+          We surveyed four communities in mangrove expansion areas (Corpus Christi, Galveston,
+          Panama City Beach, and Cedar Key) to explore how people in these communities perceive
+          mangroves changing and how they think the change should be managed.
         </div>
       </div>
       <div v-for="option in socialOptions" :key="option" class="q-mx-lg">
@@ -187,7 +265,7 @@
           @update:model-value="this.socialSelection = this.socialSelection.slice(-1)"
         ></q-checkbox>
       </div>
-      <div
+      <!-- <div
         v-if="
           this.socialSelection ==
           'How do people in mangrove expansion areas perceive the benefits provided by marshes versus mangroves?'
@@ -204,7 +282,7 @@
             @update:model-value="this.subSocialSelection = this.subSocialSelection.slice(-1)"
           ></q-checkbox>
         </div>
-      </div>
+      </div> -->
     </q-expansion-item>
   </div>
 </template>
@@ -235,7 +313,7 @@ export default {
           showDesc: false
         },
         {
-          label: 'Above Ground Biomass',
+          label: 'Aboveground Biomass',
           value: 'Aboveground Biomass',
           showDesc: false
         }
@@ -276,23 +354,26 @@ export default {
         // },
         {
           label: 'What do people think is driving mangrove change in expansion areas?',
-          value: 'What do people think is driving mangrove change in expansion areas?'
+          value: 'What do people think is driving mangrove change in expansion areas?',
+          id: 27
         },
         {
           label: 'What actions do people think need to be taken for mangroves in expansion areas?',
-          value: 'What actions do people think need to be taken for mangroves in expansion areas?'
-        },
-        {
-          label:
-            'How do people in mangrove expansion areas perceive the benefits provided by marshes versus mangroves?',
-          value:
-            'How do people in mangrove expansion areas perceive the benefits provided by marshes versus mangroves?'
+          value: 'What actions do people think need to be taken for mangroves in expansion areas?',
+          id: 28
         }
+        // {
+        //   label:
+        //     'How do people in mangrove expansion areas perceive the benefits provided by marshes versus mangroves?',
+        //   value:
+        //     'How do people in mangrove expansion areas perceive the benefits provided by marshes versus mangroves?'
+        // }
       ],
       stateLawLayer: [
         {
           label: 'Where are mangroves protected by state law?',
-          value: 'Where are mangroves protected by state law?'
+          value: 'Where are mangroves protected by state law?',
+          showDesc: false
         }
       ],
       subSocialOptions: [

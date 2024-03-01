@@ -6,10 +6,24 @@
     <div id="legendContainer" style="width: 20vw; display: flex; margin: 0px !important"></div>
     <div
       id="socialContainer"
-      style="width: 50vw; height: 38vh; border: 5px grey solid; border-radius: 2px"
+      style="width: 68%; height: 40%; border: 5px grey solid; border-radius: 2px"
     >
       <img
+        v-if="
+          this.socialSelection ==
+          'What do people think is driving mangrove change in expansion areas?'
+        "
         src="../../assets/surveyQ1.jpg"
+        height="100%"
+        width="100%"
+        style="margin-top: auto; margin-bottom: auto; display: block"
+      />
+      <img
+        v-if="
+          this.socialSelection ==
+          'What actions do people think need to be taken for mangroves in expansion areas?'
+        "
+        src="../../assets/SurveyQ2.jpg"
         height="100%"
         width="100%"
         style="margin-top: auto; margin-bottom: auto; display: block"
@@ -72,7 +86,8 @@ export default {
       previousMangroveLayer: 6,
       previousClimaticLayer: '',
       intensity: '',
-      subLegendInfo: false
+      subLegendInfo: false,
+      lastSocial: ''
     }
   },
   computed: {
@@ -489,55 +504,6 @@ export default {
       title: 'Mangrove Explorer',
       sublayers: [
         {
-          id: 0,
-          title: 'Mangrove Distribution in the SE United States',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8
-        },
-        {
-          id: 1,
-          title: 'Mangrove Presence and Absence (based on expert input 2023)',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8
-        },
-        {
-          id: 2,
-          title: 'Mangrove Expansion Zones',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8
-        },
-        {
-          id: 3,
-          title: 'Potential Change in Mangrove Presence by 2100',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8
-        },
-        {
-          id: 4,
-          title: 'Modeling Current and Future Mangroves',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8
-        },
-        {
-          id: 5,
-          title: 'Current and Future Mangroves',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8
-        },
-        {
-          id: 18,
-          title: 'Climatic Drivers of Mangrove Change',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8
-        },
-        {
           id: 19,
           title: 'Extreme Minimum Temperature (Recent Climate)',
           visible: false,
@@ -580,6 +546,55 @@ export default {
           opacity: 0.8
         },
         {
+          id: 0,
+          title: 'Mangrove Distribution in the SE United States',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8
+        },
+        {
+          id: 1,
+          title: 'Mangrove Presence and Absence (based on expert input 2023)',
+          visible: true,
+          intensity: undefined,
+          opacity: 0.8
+        },
+        {
+          id: 2,
+          title: 'Mangrove Expansion Zones',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8
+        },
+        {
+          id: 3,
+          title: 'Potential Change in Mangrove Presence by 2100',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8
+        },
+        {
+          id: 4,
+          title: 'Modeling Current and Future Mangroves',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8
+        },
+        {
+          id: 5,
+          title: 'Current and Future Mangroves',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8
+        },
+        {
+          id: 18,
+          title: 'Climatic Drivers of Mangrove Change',
+          visible: false,
+          intensity: undefined,
+          opacity: 0.8
+        },
+        {
           id: 25,
           title: 'Policy and Social Context',
           visible: false,
@@ -593,23 +608,24 @@ export default {
           visible: false,
           intensity: undefined,
           opacity: 0.8,
-          legendEnabled: false
+          question: 'Where are mangroves protected by state law?'
         },
         {
           id: 27,
-          title: 'What do people think is driving mangrove change in expansion areas?',
+          title: 'Community Survey Locations',
           visible: false,
           intensity: undefined,
           opacity: 0.8,
-          legendEnabled: false
+          question: 'What do people think is driving mangrove change in expansion areas?'
         },
         {
           id: 28,
-          title: 'What actions do people think need to be taken for mangroves in expansion areas?',
+          title: 'Community Survey Locations',
           visible: false,
           intensity: undefined,
           opacity: 0.8,
-          legendEnabled: false
+          question:
+            'What actions do people think need to be taken for mangroves in expansion areas?'
         },
         {
           id: 29,
@@ -797,7 +813,7 @@ export default {
         {
           id: 6,
           title: 'Mangrove Presence (Recent Climate)',
-          visible: true,
+          visible: false,
           intensity: 'Current',
           opacity: 0.8
         },
@@ -838,21 +854,21 @@ export default {
         },
         {
           id: 12,
-          title: 'Above Ground Biomass (Recent Climate)',
+          title: 'Aboveground Biomass (Recent Climate)',
           visible: false,
           intensity: 'Current',
           opacity: 0.8
         },
         {
           id: 13,
-          title: 'Above Ground Biomass (Future Moderate Climate)',
+          title: 'Aboveground Biomass (Future Moderate Climate)',
           visible: false,
           intensity: 'Moderate',
           opacity: 0.8
         },
         {
           id: 14,
-          title: 'Above Ground Biomass (Future Severe Climate)',
+          title: 'Aboveground Biomass (Future Severe Climate)',
           visible: false,
           intensity: 'Intense',
           opacity: 0.8
@@ -1142,10 +1158,6 @@ export default {
     },
 
     updateMangroveLayerVis(type, intensity) {
-      if (this.layerSelection == []) {
-        console.log('no layer selected')
-      }
-
       if (this.previousMangroveLayer !== '') {
         esri.mapImageLayer.findSublayerById(this.previousMangroveLayer).visible = false
       }
@@ -1167,9 +1179,6 @@ export default {
         if (layer.id == 1 || layer.id == 2 || layer.id == 3 || layer.id == 4) {
           if (array.includes(layer.title) == true) {
             layer.visible = true
-
-            // console.log(layer.layer)
-            console.log(this.layerDescriptions)
           } else {
             layer.visible = false
           }
@@ -1203,35 +1212,65 @@ export default {
     },
 
     updateSocialLayerVis(title) {
-      esri.mapImageLayer.sublayers.forEach((layer) => {
-        if (layer.id >= 24) {
-          if (layer.title === title) {
-            layer.visible = true
-          } else {
+      // title ==
+      //     'How do people in mangrove expansion areas perceive the benefits provided by marshes versus mangroves?'
+
+      if (this.lastSocial !== '') {
+        esri.mapImageLayer.findSublayerById(this.lastSocial).visible = false
+      }
+
+      if (title == '' || title == undefined) {
+        this.zoomToLayer()
+      } else {
+        esri.mapImageLayer.sublayers.forEach((layer) => {
+          if (layer.question && layer.question == title) {
+            if (title == 'Where are mangroves protected by state law?') {
+              layer.visible = true
+              this.lastSocial = layer.id
+              this.zoomToLayer()
+            } else if (
+              title == 'What do people think is driving mangrove change in expansion areas?'
+            ) {
+              this.zoomToSocial()
+              if (layer.question == title) {
+                layer.visible = true
+                this.lastSocial = layer.id
+              }
+            } else if (
+              title ==
+              'What actions do people think need to be taken for mangroves in expansion areas?'
+            ) {
+              this.zoomToSocial()
+              if (layer.question == title) {
+                layer.visible = true
+                this.lastSocial = layer.id
+              }
+            }
+          } else if (layer.question && layer.question !== title) {
             layer.visible = false
           }
-        }
-      })
-
-      if (
-        title == 'What do people think is driving mangrove change in expansion areas?' ||
-        title ==
-          'What actions do people think need to be taken for mangroves in expansion areas?' ||
-        title ==
-          'How do people in mangrove expansion areas perceive the benefits provided by marshes versus mangroves?'
-      ) {
-        esri.lgExpand.collapse()
-        esri.socialExpand.visible = true
-        esri.socialExpand.expand()
-        esri.mapView.goTo({
-          center: [-90.213542, 26.58333],
-          zoom: 6
         })
-      } else {
-        esri.lgExpand.expand()
-        esri.socialExpand.visible = false
-        esri.socialExpand.collapse()
       }
+    },
+
+    zoomToSocial() {
+      esri.lgExpand.collapse()
+      esri.socialExpand.visible = true
+      esri.socialExpand.expand()
+      esri.mapView.goTo({
+        center: [-90.273655, 24.654709],
+        zoom: 5
+      })
+    },
+
+    zoomToLayer() {
+      esri.lgExpand.expand()
+      esri.socialExpand.visible = false
+      esri.socialExpand.collapse()
+      esri.mapView.goTo({
+        center: [-88.900345, 29.222555],
+        zoom: 5
+      })
     },
 
     updateSubSocialLayerVis(question) {

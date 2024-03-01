@@ -1,5 +1,5 @@
 <template>
-  <div class="q-mt-none">
+  <div class="q-mt-md">
     <!-- <q-splitter style="overflow: hidden" v-model="splitterModel" unit="px" :limits="[60, 100]"> -->
     <!--Example with supporting layers in a vertical tab-->
 
@@ -107,7 +107,7 @@
 
     <!-- <template v-slot:after> -->
     <!-- <q-tab-panels v-model="tab" animated vertical keep-alive> -->
-    <q-tab-panel name="tab1" class="q-pr-none q-pl-none q-mb-lg">
+    <q-tab-panel name="tab1" class="q-pa-none">
       <q-scroll-area id="" class="panel panelM" :thumb-style="{ display: 'none !important' }">
         <div class="">
           <keep-alive><tab1></tab1></keep-alive>
