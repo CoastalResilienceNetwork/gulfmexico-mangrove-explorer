@@ -42,8 +42,8 @@
   </header>
 
   <!-- INTRO DIALOG -->
-  <q-dialog v-model="showHelp" :persistent="persistent" maximized>
-    <div class="row">
+  <!-- <q-dialog v-model="showHelp" :persistent="persistent" maximized> -->
+  <!-- <div class="row">
       <div class="col-6 overlaydiv">
         <q-img src="mangrove.jpg" style="height: 100%"></q-img>
         <div
@@ -90,28 +90,23 @@
         </q-input>
         <q-btn color="dark" @click="loginUser" class="q-mt-md">LOGIN</q-btn>
       </div>
-    </div>
-    <!-- <q-dialog v-model="showHelp" :persistent="persistent">
-      <q-card style="height: 72vh; max-width: 70vw">
-        <q-toolbar class="bg-white">
-          <q-toolbar-title>
-            <span class="text-primary text-center"
-              ><strong>About Mangrove Explorer</strong>
-            </span></q-toolbar-title
-          >
-        </q-toolbar>
-        <div
-          style="
-            background-image: url(mangrove.jpg);
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: cover;
-            width: 70vw;
-            height: 55vh;
-          "
+    </div> -->
+  <!-- <q-dialog v-model="showHelp" :persistent="persistent">
+    <q-card style="height: 100vh; max-width: 100vw; display: block; position: fixed; right: 0px">
+      <q-toolbar class="bg-white">
+        <q-toolbar-title>
+          <span class="text-primary text-center"
+            ><strong>About Mangrove Explorer</strong>
+          </span></q-toolbar-title
         >
-          <div style="background-color: rgb(220, 220, 220, 0.5); width: 70vw; height: 55vh">
-            <p style="font-weight: 450; font-size: x-large; padding: 25px">
+      </q-toolbar>
+      <div>
+        <q-img src="bg_image.jpg" style="height: 90vh; width: 60vw">
+          <div
+            class="absolute-full text-subtitle2 flex flex-center"
+            style="background-color: rgb(220, 220, 220, 0.5)"
+          >
+            <div style="font-weight: 450; font-size: x-large; padding: 25px">
               Welcome to the Mangrove Explorer Mapping Tool. The Mangrove Explorer was created by a
               multidisciplinary team of scientists and researchers to share cutting edge research
               related to the future distribution of mangroves in the continental United States. The
@@ -130,43 +125,38 @@
               maps provide the user with a glimpse into the future where mangroves will likely
               expand across the majority of the upper Gulf of Mexico and up the east coast into the
               Carolinas by the Year 2100.
-            </p>
+            </div>
           </div>
-        </div>
-        <q-img src="mangrove.jpg" style="width: 70vw; height: 55vh"> </q-img> -->
-    <q-card-actions class="q-pb-none">
-      <q-checkbox
-        v-if="showUserOption"
-        v-model="userHideDialogOptionMeramac"
-        label="Do not show again"
-      />
-      <q-space />
-      <q-btn flat label="OK" color="primary" @click="setUserChoice" v-close-popup />
-    </q-card-actions>
-    <div v-if="showUserOption" class="text-caption q-ml-md text-grey-7">
-      *This dialog can be rerieved at any time by clicking the help button at the top of the screen
-    </div>
-    <!-- </q-card> -->
-    <!-- </q-dialog>  -->
-    <!--q-card-actions class="q-pb-none">
-      <q-checkbox
-        v-if="showUserOption"
-        v-model="userHideDialogOptionMeramac"
-        label="Do not show again"
-      />
-      <q-space />
-      <q-btn
-        flat
-        label="OK"
-        color="primary"
-        @click="setUserChoice"
-        v-close-popup
-      />
-    </q-card-actions-->
-    <div v-if="showUserOption" class="text-caption q-ml-md text-grey-7">
-      *This dialog can be rerieved at any time by clicking the help button at the top of the screen
-    </div>
-  </q-dialog>
+        </q-img>
+      </div>
+      <q-card-actions class="q-pb-none">
+        <q-checkbox
+          v-if="showUserOption"
+          v-model="userHideDialogOptionMeramac"
+          label="Do not show again"
+        />
+        <q-space />
+        <q-btn flat label="OK" color="primary" @click="setUserChoice" v-close-popup />
+      </q-card-actions>
+      <div v-if="showUserOption" class="text-caption q-ml-md text-grey-7">
+        *This dialog can be rerieved at any time by clicking the help button at the top of the
+        screen
+      </div>
+    </q-card>
+  </q-dialog> -->
+  <!-- <q-card-actions class="q-pb-none">
+    <q-checkbox
+      v-if="showUserOption"
+      v-model="userHideDialogOptionMeramac"
+      label="Do not show again"
+    />
+    <q-space />
+    <q-btn flat label="OK" color="primary" @click="setUserChoice" v-close-popup />
+  </q-card-actions> -->
+  <!-- <div v-if="showUserOption" class="text-caption q-ml-md text-grey-7">
+    *This dialog can be rerieved at any time by clicking the help button at the top of the screen
+  </div> -->
+  <!-- </q-dialog> -->
 </template>
 
 <script>

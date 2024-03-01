@@ -87,7 +87,8 @@ export default {
       previousClimaticLayer: '',
       intensity: '',
       subLegendInfo: false,
-      lastSocial: ''
+      lastSocial: '',
+      testwords: false
     }
   },
   computed: {
@@ -253,10 +254,14 @@ export default {
       this.updateMangroveLayerVis(this.layerSelection[0], this.intensity)
     },
     sliderValue() {
-      console.log(this.sliderValue)
       this.updateIntensity(this.sliderValue)
       this.updateMangroveLayerVis(this.layerSelection[0], this.intensity)
       this.updateClimaticLayerVis(this.climaticSelection[0], this.intensity)
+
+      console.log(this.sliderValue)
+      console.log(this.intensity)
+      console.log(this.layerSelection)
+      console.log(this.climaticSelection)
     },
     supportingSelection() {
       this.updateSupportingLayerVis(this.supportingSelection)
@@ -269,11 +274,6 @@ export default {
     },
     subSocialSelection() {
       this.updateSubSocialLayerVis(this.subSocialSelection[0])
-    },
-    descriptionsComplete() {
-      if (this.descriptionsComplete == true) {
-        this.getDescriptions()
-      }
     }
   },
 
@@ -897,6 +897,7 @@ export default {
       ]
     })
 
+    this.getDescriptions()
     esri.map.add(esri.mapImageLayer)
   },
 

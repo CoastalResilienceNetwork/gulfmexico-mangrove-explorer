@@ -79,7 +79,7 @@ export default createStore({
     mapPrintURI: '',
     layerOption: [],
     mangroveLayer: '',
-    layerSelection: [''],
+    layerSelection: ['None'],
     climaticSelection: ['None'],
     supportingSelection: ['Mangrove Presence and Absence (based on expert input 2023)'],
     socialSelection: ['None'],
