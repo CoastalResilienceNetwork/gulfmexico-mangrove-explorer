@@ -1590,6 +1590,13 @@ export default {
     position: relative;
     border-bottom: #999 solid 1pt;
   }
+  #legendContainer {
+    width: fit-content !important;
+    height: fit-content !important;
+  }
+  .esri-view-width-xsmall .esri-expand--auto .esri-expand__container--expanded {
+    height: fit-content;
+  }
 }
 #printBtn {
   position: absolute;

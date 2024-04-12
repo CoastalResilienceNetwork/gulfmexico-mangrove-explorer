@@ -36,9 +36,9 @@
       <span class="text-dark text-bold">Coastal Resilience</span>
       <span class="text-bold text-subtitle1"> Mangrove Explorer</span>
     </span>
-    <div>
+    <!-- <div>
       <q-btn @click="showHelp = true" padding="none" color="dark" flat icon="help" />
-    </div>
+    </div> -->
   </header>
 
   <!-- INTRO DIALOG -->
