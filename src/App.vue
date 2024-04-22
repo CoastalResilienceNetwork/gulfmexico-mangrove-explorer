@@ -5,8 +5,8 @@
   <the-header></the-header>
 
   <div>
-    <div v-if="testdiv == true">
-      <div id="splash-screen" v-if="smallScreen && testdiv == true">
+    <div v-if="splashDiv == true">
+      <div id="splash-screen" v-if="smallScreen && splashDiv == true">
         <div>
           <q-img src="MangroveMap.jpg" style="height: 100vh; width: 100%; overflow-y: scroll">
             <div class="absolute-full text-subtitle2">
@@ -54,7 +54,7 @@
         </div>
       </div>
     </div>
-    <div id="mobile" v-if="smallScreen && testdiv == false" class="print-hide">
+    <div id="mobile" v-if="smallScreen && splashDiv == false" class="print-hide">
       <q-splitter
         v-model="splitterModelMobile"
         unit="px"
@@ -83,7 +83,7 @@
       </q-splitter>
     </div>
     <div id="desktop" v-if="!smallScreen" class="print-hide">
-      <q-dialog v-model="testdiv" v-if="testdiv == true">
+      <q-dialog v-model="splashDiv" v-if="splashDiv == true">
         <q-card
           style="
             background-image: url(MangroveMap.jpg);
@@ -129,7 +129,7 @@
             <q-btn
               label="Enter"
               color="primary"
-              @click="testdiv = false"
+              @click="splashDiv = false"
               style="
                 margin: auto auto 25px auto;
                 width: fit-content;
@@ -178,7 +178,7 @@
         </template>
         <template v-slot:after>
           <!--MAP COMPONENT-->
-          <!-- <div id="splash-screen" v-if="testdiv == true">
+          <!-- <div id="splash-screen" v-if="splashDiv == true">
             <div>
               <q-img src="bg_image.jpg" style="height: 100vh; width: 100%; overflow-y: scroll">
                 <div class="absolute-full text-subtitle2">
@@ -226,7 +226,7 @@
               </q-img>
             </div>
           </div> -->
-          <the-map v-if="this.testdiv == false"></the-map>
+          <the-map></the-map>
         </template>
       </q-splitter>
     </div>
@@ -256,8 +256,7 @@ export default {
       panelScreenSize: 'v-slot:before',
       //for the service worker (pwa update)
       registration: null,
-      updateExists: false,
-      testdiv: true
+      updateExists: false
     }
   },
   created() {
@@ -275,6 +274,14 @@ export default {
   computed: {
     smallScreen() {
       return this.$q.screen.lt.sm
+    },
+    splashDiv: {
+      get() {
+        return this.$store.state.splashDiv
+      },
+      set(value) {
+        this.$store.commit('updateSplashDiv', value)
+      }
     }
   },
   mounted() {
@@ -303,7 +310,7 @@ export default {
       })
     },
     showMap() {
-      this.testdiv = false
+      this.splashDiv = false
     }
   },
   updateAvailable(event) {

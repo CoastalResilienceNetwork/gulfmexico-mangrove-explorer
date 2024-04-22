@@ -217,6 +217,14 @@ export default {
     },
     descriptionsComplete() {
       return this.$store.state.descriptionsComplete
+    },
+    mapLoaded: {
+      get() {
+        return this.$store.state.mapLoaded
+      },
+      set(value) {
+        this.$store.commit('updateMapLoaded', value)
+      }
     }
   },
   watch: {
@@ -260,18 +268,11 @@ export default {
     layerSelection() {
       this.updateIntensity(this.sliderValue)
       this.updateMangroveLayerVis(this.layerSelection[0], this.intensity)
-
-      console.log(this.layerSelection[0])
     },
     sliderValue() {
       this.updateIntensity(this.sliderValue)
       this.updateMangroveLayerVis(this.layerSelection[0], this.intensity)
       this.updateClimaticLayerVis(this.climaticSelection[0], this.intensity)
-
-      console.log(this.sliderValue)
-      console.log(this.intensity)
-      console.log(this.layerSelection)
-      console.log(this.climaticSelection)
     },
     supportingSelection() {
       this.updateSupportingLayerVis(this.supportingSelection)
@@ -1003,7 +1004,6 @@ export default {
     },
 
     updateSupportingOpacity() {
-      console.log(this.presenceOpacity)
       let l = this.supportingVisibleLayerOpacity
       // if it is a raster find the sublayer and set the opacity
       if (l.type === 'Raster Layer') {
@@ -1173,9 +1173,6 @@ export default {
     },
 
     updateMangroveLayerVis(type, intensity) {
-      console.log(type)
-      console.log(intensity)
-
       if (this.previousMangroveLayer !== '') {
         esri.mapImageLayer.findSublayerById(this.previousMangroveLayer).visible = false
       }
@@ -1195,8 +1192,6 @@ export default {
     },
 
     updateSupportingLayerVis(array) {
-      console.log(array)
-
       esri.mapImageLayer.sublayers.forEach((layer) => {
         // if (layer.id == 1 || layer.id == 2 || layer.id == 3 || layer.id == 4) {
         if (array.includes(layer.id) == true) {
@@ -1307,8 +1302,6 @@ export default {
       let percepMarsh = [38, 39, 40, 41, 42, 43]
       let percepMixed = [45, 46]
       let percepVary = [48]
-
-      console.log(question)
 
       if (question !== undefined) {
         esri.lgExpand.collapse()

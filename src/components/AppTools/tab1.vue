@@ -1,8 +1,8 @@
 <template>
   <div>
     <q-expansion-item
-      label="Mangrove Distribution in the SE United States"
       default-opened
+      label="Mangrove Distribution in the SE United States"
       dense
       :header-style="{ textAlign: 'center', fontWeight: 'bold' }"
     >
@@ -400,7 +400,8 @@ export default {
         { value: 2, label: 'Future Severe', style: { width: '30%' } }
       ],
       showInfo: false,
-      intensity: '(Recent Climate)'
+      intensity: '(Recent Climate)',
+      expanded: false
     }
   },
   computed: {
@@ -470,6 +471,12 @@ export default {
       set(value) {
         this.$store.commit('updateSupportingOptions', value)
       }
+    },
+    mapLoaded() {
+      return this.$store.state.mapLoaded
+    },
+    splashDiv() {
+      return this.$store.state.splashDiv
     }
   },
   methods: {
@@ -486,6 +493,18 @@ export default {
   watch: {
     sliderValue() {
       this.changeIntensity(this.sliderValue)
+    },
+    mapLoaded() {
+      console.log(this.mapLoaded)
+      if (this.mapLoaded == true) {
+        this.expanded = true
+      }
+    },
+    supportingOptions() {
+      if (this.supportingOptions) {
+        console.log(this.supportingOptions)
+        this.expanded = true
+      }
     }
   }
 }

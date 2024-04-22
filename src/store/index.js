@@ -92,7 +92,9 @@ export default createStore({
     supportingOption: [],
     opacityLayerId: -1,
     layerDescriptions: [],
-    descriptionsComplete: false
+    descriptionsComplete: false,
+    splashDiv: true,
+    mapLoaded: false
   },
   mutations: {
     //data retrieved from web services
@@ -171,6 +173,12 @@ export default createStore({
     },
     updateDescriptionsComplete(state, val) {
       state.descriptionsComplete = val
+    },
+    updateSplashDiv(state, val) {
+      state.splashDiv = val
+    },
+    updateMapLoaded(state, val) {
+      state.mapLoaded = val
     }
   },
 
