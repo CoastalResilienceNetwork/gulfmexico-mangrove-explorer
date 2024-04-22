@@ -81,13 +81,14 @@ export default createStore({
     mangroveLayer: '',
     layerSelection: ['None'],
     climaticSelection: ['None'],
-    supportingSelection: ['Mangrove Presence and Absence (based on expert input 2023)'],
+    supportingSelection: [1],
     socialSelection: ['None'],
     subSocialSelection: ['None'],
     sliderValue: 0,
     supportOpacity: 0.8,
     tabSupLayers: [],
     selectedOption: [],
+    supportingOptions: [],
     supportingOption: [],
     opacityLayerId: -1,
     layerDescriptions: [],
@@ -152,6 +153,9 @@ export default createStore({
     },
     updateSelectedOption(state, val) {
       state.selectedOption = val
+    },
+    updateSupportingOptions(state, val) {
+      state.supportingOptions = val
     },
     updateSupportingOption(state, val) {
       state.supportingOption = val

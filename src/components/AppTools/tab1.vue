@@ -10,31 +10,27 @@
         <q-checkbox
           size="sm"
           v-model="this.supportingSelection"
-          :val="option.value"
-          :label="option.label"
+          :val="option.id"
+          :label="option.title"
           toggle-order="tf"
         ></q-checkbox>
 
         <icon-button
-          v-if="!option.showDesc"
+          v-if="option.showDesc == false"
           type="info"
           method="show-resource"
           @show-resource="option.showDesc = true"
           style="margin: 5px"
         ></icon-button>
         <icon-button
-          v-if="option.showDesc"
+          v-if="option.showDesc == true"
           type="close"
           method="hide-resource"
           @hide-resource="option.showDesc = false"
           style="margin: 5px"
         ></icon-button>
-        <div v-for="desc in this.layerDescriptions" :key="desc">
-          <div v-if="option.showDesc == true">
-            <div v-if="desc.title.includes(option.value) == true || desc.title == option.label">
-              <div v-html="desc.description" style="font-size: small"></div>
-            </div>
-          </div>
+        <div v-if="option.showDesc == true">
+          <div v-html="option.description" style="font-size: small"></div>
         </div>
       </div>
     </q-expansion-item>
@@ -196,8 +192,9 @@
     >
       <div class="q-mx-lg q-my-sm">
         <div>
-          We researched mangrove specific policies in each state to determine which Gulf of Mexico
-          and Southeast US States explicitly protect mangroves from being destroyed or removed.
+          We researched mangrove specific policies in each state to determine which states
+          explicitly protect mangroves from being destroyed or removed to better understand how
+          range expansion might be impacted by state policy.
         </div>
       </div>
       <div v-for="option in stateLawLayer" :key="option" class="q-mx-lg">
@@ -330,23 +327,26 @@ export default {
           showDesc: false
         }
       ],
-      supportingOptions: [
-        {
-          label: 'Mangrove Presence and Absence (based on expert input 2023)',
-          value: 'Mangrove Presence and Absence (based on expert input 2023)',
-          showDesc: false
-        },
-        {
-          label: 'Mangrove Expansion Zones',
-          value: 'Mangrove Expansion Zones',
-          showDesc: false
-        },
-        {
-          label: 'Potential Change in Mangrove Presence by 2100',
-          value: 'Potential Change in Mangrove Presence by 2100',
-          showDesc: false
-        }
-      ],
+      // supportingOptions: [
+      //   {
+      //     id: 1,
+      //     label: 'Mangrove Presence and Absence (based on expert input 2023)',
+      //     value: 'Mangrove Presence and Absence (based on expert input 2023)',
+      //     showDesc: false
+      //   },
+      //   {
+      //     id: 2,
+      //     label: 'Mangrove Expansion Zones',
+      //     value: 'Mangrove Expansion Zones',
+      //     showDesc: false
+      //   },
+      //   {
+      //     id: 3,
+      //     label: 'Potential Change in Mangrove Presence by 2100',
+      //     value: 'Potential Change in Mangrove Presence by 2100',
+      //     showDesc: false
+      //   }
+      // ],
       socialOptions: [
         // {
         //   label: 'Where are mangroves protected by state law?',
@@ -462,6 +462,14 @@ export default {
     },
     layerDescriptions() {
       return this.$store.state.layerDescriptions
+    },
+    supportingOptions: {
+      get() {
+        return this.$store.state.supportingOptions
+      },
+      set(value) {
+        this.$store.commit('updateSupportingOptions', value)
+      }
     }
   },
   methods: {

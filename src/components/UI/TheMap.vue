@@ -188,6 +188,14 @@ export default {
         this.$store.commit('updateSupportingOption', value)
       }
     },
+    supportingOptions: {
+      get() {
+        return this.$store.state.supportingOptions
+      },
+      set(value) {
+        this.$store.commit('updateSupportingOptions', value)
+      }
+    },
     supportOpacity: {
       get() {
         return this.$store.state.supportOpacity
@@ -293,6 +301,10 @@ export default {
         }
       }
     })
+
+    // Get info button descriptions
+
+    this.getDescriptions()
 
     //create the map view
     esri.mapView = new MapView({
@@ -554,21 +566,21 @@ export default {
         },
         {
           id: 1,
-          title: 'Mangrove Presence and Absence (based on expert input 2023)',
+          // title: 'Mangrove Presence and Absence (based on expert input 2023)',
           visible: true,
           intensity: undefined,
           opacity: 0.8
         },
         {
           id: 2,
-          title: 'Mangrove Expansion Zones',
+          // title: 'Mangrove Expansion Zones',
           visible: false,
           intensity: undefined,
           opacity: 0.8
         },
         {
           id: 3,
-          title: 'Potential Change in Mangrove Presence by 2100',
+          // title: 'Potential Change in Mangrove Presence by 2100',
           visible: false,
           intensity: undefined,
           opacity: 0.8
@@ -896,8 +908,6 @@ export default {
         }
       ]
     })
-
-    this.getDescriptions()
     esri.map.add(esri.mapImageLayer)
   },
 
@@ -1179,14 +1189,16 @@ export default {
     },
 
     updateSupportingLayerVis(array) {
+      console.log(array)
+
       esri.mapImageLayer.sublayers.forEach((layer) => {
-        if (layer.id == 1 || layer.id == 2 || layer.id == 3 || layer.id == 4) {
-          if (array.includes(layer.title) == true) {
-            layer.visible = true
-          } else {
-            layer.visible = false
-          }
+        // if (layer.id == 1 || layer.id == 2 || layer.id == 3 || layer.id == 4) {
+        if (array.includes(layer.id) == true) {
+          layer.visible = true
+        } else {
+          layer.visible = false
         }
+        // }
       })
     },
 
@@ -1405,6 +1417,7 @@ export default {
     getDescriptions() {
       let obj = []
       let layDesc = []
+      let suppOp = []
       let smnum = this.$store.state.config.forLayerDescriptions.length
       let smcount = 0
       this.$store.state.config.forLayerDescriptions.forEach((service, index) => {
@@ -1469,6 +1482,21 @@ export default {
                 //set the location of the parent
                 let parentLoc = storeNodes[nodesIndex].parentLoc
                 //push the child to the parent
+
+                if (l.id == 1 || l.id == 2 || l.id == 3) {
+                  suppOp.push({
+                    id: l.id,
+                    title: l.name,
+                    showDesc: false,
+                    description: l.description
+                      .replace('&lt;/a&gt;', '</a>')
+                      .replace('&lt;a', '<a')
+                      .replace('&lt;', '<')
+                      .replace('&gt;', '>')
+                      .replace('STYLE="text-align:Left;font-size:12pt"', '')
+                  })
+                }
+
                 parentLoc.children.push({
                   label: l.name,
                   children: [],
@@ -1552,6 +1580,10 @@ export default {
         })
       })
       this.layerDescriptions = layDesc
+
+      this.supportingOptions = suppOp
+
+      console.log(this.supportingOptions)
     }
   }
 }
