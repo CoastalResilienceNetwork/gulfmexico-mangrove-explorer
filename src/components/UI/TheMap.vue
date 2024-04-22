@@ -286,6 +286,10 @@ export default {
   },
 
   mounted() {
+    // Get info button descriptions
+
+    this.getDescriptions()
+
     // Portal IDs for TNC Basemaps. Use any id to set the map's basemap.
 
     // const tncHillshadeMapId = 'd22aed9a4acb4bc8ae8f2141732af496'
@@ -301,11 +305,6 @@ export default {
         }
       }
     })
-
-    // Get info button descriptions
-
-    this.getDescriptions()
-
     //create the map view
     esri.mapView = new MapView({
       map: esri.map,
@@ -1582,8 +1581,6 @@ export default {
       this.layerDescriptions = layDesc
 
       this.supportingOptions = suppOp
-
-      console.log(this.supportingOptions)
     }
   }
 }

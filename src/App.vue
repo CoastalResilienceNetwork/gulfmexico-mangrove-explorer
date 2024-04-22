@@ -8,7 +8,7 @@
     <div v-if="testdiv == true">
       <div id="splash-screen" v-if="smallScreen && testdiv == true">
         <div>
-          <q-img src="bg_image.jpg" style="height: 100vh; width: 100%; overflow-y: scroll">
+          <q-img src="MangroveMap.jpg" style="height: 100vh; width: 100%; overflow-y: scroll">
             <div class="absolute-full text-subtitle2">
               <!-- <div class="text-h3 text-center" style="margin: 15px">About Mangrove Explorer</div> -->
               <div style="font-weight: 300; font-size: large; padding: 25px; line-height: normal">
@@ -35,16 +35,19 @@
                 <q-btn
                   @click="this.showMap()"
                   color="primary"
-                  style="margin: 5px auto 5px auto; display: block"
+                  style="margin: 5px auto 25px auto; display: block"
                   size="18px"
                   >Enter</q-btn
                 >
               </div>
-              <div class="row justify-around items-end" style="padding-bottom: 10%">
-                <q-img src="UofA_Stokes.jpg" style="width: 250px" fit="contain" />
+              <div
+                class="row justify-around items-end"
+                style="padding: 10%; background-color: white"
+              >
+                <q-img src="TNCLogoPrimary_RGB.jpg" style="width: 250px" fit="contain" />
                 <q-img src="NE_University.jpg" style="width: 250px" fit="contain" />
                 <q-img src="USGS_logo_green.png" style="width: 250px" fit="contain" />
-                <q-img src="TNCLogoPrimary_RGB.jpg" style="width: 250px" fit="contain" />
+                <q-img src="UofA_Stokes.jpg" style="width: 250px" fit="contain" />
               </div>
             </div>
           </q-img>
@@ -80,10 +83,30 @@
       </q-splitter>
     </div>
     <div id="desktop" v-if="!smallScreen" class="print-hide">
-      <q-dialog v-model="testdiv" v-if="testdiv == true" style="width: 100vw; height: auto">
-        <q-card>
-          <q-card-section>
-            <div style="font-weight: 300; font-size: large; padding: 25px; line-height: normal">
+      <q-dialog v-model="testdiv" v-if="testdiv == true">
+        <q-card
+          style="
+            background-image: url(MangroveMap.jpg);
+            background-position: center;
+            height: auto;
+            width: 100vw;
+            background-size: cover;
+            background-repeat: no-repeat;
+          "
+        >
+          <q-card-section
+            class="column items-center justify-between"
+            style="height: auto; width: 80vw; display: block !important"
+          >
+            <div
+              style="
+                font-weight: 400;
+                font-size: x-large;
+                padding: 25px;
+                line-height: normal;
+                text-shadow: 0 0 black;
+              "
+            >
               Welcome to the Mangrove Explorer Mapping Tool. The Mangrove Explorer was created by a
               multidisciplinary team of scientists and researchers to share cutting edge research
               related to the future distribution of mangroves in the continental United States. The
@@ -107,17 +130,22 @@
               label="Enter"
               color="primary"
               @click="testdiv = false"
-              style="margin: auto; width: fit-content; display: block"
+              style="
+                margin: auto auto 25px auto;
+                width: fit-content;
+                display: block;
+                padding-bottom: 0px;
+              "
+              size="lg"
             ></q-btn>
             <div
-              class="row justify-around items-end"
+              class="justify-end"
               style="
-                position: sticky;
                 display: block;
-                bottom: 0px;
-                margin: auto;
+                padding-left: 25px;
                 width: fit-content;
-                padding-top: 25px;
+                background-color: white !important;
+                margin: auto;
               "
             >
               <q-img src="TNCLogoPrimary_RGB.jpg" style="width: 250px" fit="contain" />
