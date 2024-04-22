@@ -260,6 +260,8 @@ export default {
     layerSelection() {
       this.updateIntensity(this.sliderValue)
       this.updateMangroveLayerVis(this.layerSelection[0], this.intensity)
+
+      console.log(this.layerSelection[0])
     },
     sliderValue() {
       this.updateIntensity(this.sliderValue)
@@ -1171,17 +1173,22 @@ export default {
     },
 
     updateMangroveLayerVis(type, intensity) {
+      console.log(type)
+      console.log(intensity)
+
       if (this.previousMangroveLayer !== '') {
         esri.mapImageLayer.findSublayerById(this.previousMangroveLayer).visible = false
       }
 
       esri.mapImageLayer.sublayers.forEach((layer) => {
-        if (layer.title.includes(type) == true && layer.id !== 1) {
-          if (layer.intensity == intensity) {
-            this.previousMangroveLayer = layer.id
-            layer.visible = true
-          } else {
-            layer.visible = false
+        if (layer.title) {
+          if (layer.title.includes(type) == true && layer.id !== 1) {
+            if (layer.intensity == intensity) {
+              this.previousMangroveLayer = layer.id
+              layer.visible = true
+            } else {
+              layer.visible = false
+            }
           }
         }
       })
@@ -1215,12 +1222,14 @@ export default {
       }
 
       esri.mapImageLayer.sublayers.forEach((layer) => {
-        if (layer.title.includes(title) == true) {
-          if (layer.intensity == intensity) {
-            this.previousClimaticLayer = layer.id
-            layer.visible = true
-          } else {
-            layer.visible = false
+        if (layer.title) {
+          if (layer.title.includes(title) == true) {
+            if (layer.intensity == intensity) {
+              this.previousClimaticLayer = layer.id
+              layer.visible = true
+            } else {
+              layer.visible = false
+            }
           }
         }
       })
