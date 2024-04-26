@@ -212,6 +212,26 @@ export default createStore({
                   type = 'Featue Layer'
                 } else type = 'Raster Layer'
               })
+
+              if (l.id == 1 || l.id == 2 || l.id == 3) {
+                let layLength = context.state.supportingOptions.length
+                let o = {
+                  id: l.id,
+                  title: l.name,
+                  showDesc: false,
+                  description: l.description
+                    .replace('&lt;/a&gt;', '</a>')
+                    .replace('&lt;a', '<a')
+                    .replace('&lt;', '<')
+                    .replace('&gt;', '>')
+                    .replace('STYLE="text-align:Left;font-size:12pt"', '')
+                }
+
+                if (layLength < 3) {
+                  context.state.supportingOptions.push(o)
+                }
+              }
+
               // add layer to layer viewer if it's id is not present in the skip array
               if (service.skipLayers.indexOf(l.id) == -1) {
                 // Group Layer with no parent

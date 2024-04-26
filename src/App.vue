@@ -19,7 +19,7 @@
                 frequency and intensity of freeze events that damage or kill mangroves. However, as
                 climate change reduces the number of freeze events, mangroves are establishing in
                 areas north of their historic range. <br /><br />
-                The Mangrove Explorer depicts the most current (2021) distribution of mangroves as
+                The Mangrove Explorer depicts the most current (2022) distribution of mangroves as
                 well as the projections of the future distribution and characteristics of mangroves
                 under future temperature and precipitation conditions. Other factors that will
                 influence the future distribution, such as policy and coastal management, are also
@@ -114,7 +114,7 @@
               intensity of freeze events that damage or kill mangroves. However, as climate change
               reduces the number of freeze events, mangroves are establishing in areas north of
               their historic range. <br /><br />
-              The Mangrove Explorer depicts the most current (2021) distribution of mangroves as
+              The Mangrove Explorer depicts the most current (2022) distribution of mangroves as
               well as the projections of the future distribution and characteristics of mangroves
               under future temperature and precipitation conditions. Other factors that will
               influence the future distribution, such as policy and coastal management, are also
@@ -124,7 +124,15 @@
               Future work is needed to address this impact in the Mangrove Explorer. For now, the
               maps provide the user with a glimpse into the future where mangroves will likely
               expand across the majority of the upper Gulf of Mexico and up the east coast into the
-              Carolinas by the Year 2100.
+              Carolinas by the Year 2100.<br />
+              <br />
+              For more information about The Nature Conservancy and partner efforts in the region
+              please visit:<br />
+              <a
+                target="_blank"
+                href="https://www.nature.org/en-us/what-we-do/our-priorities/protect-water-and-land/land-and-water-stories/us-mangroves-conservation/?vu=usmangroves"
+                >TNC | Ensuring a Future for Mangroves in the U.S.</a
+              >
             </div>
             <q-btn
               label="Enter"
@@ -139,7 +147,7 @@
               size="lg"
             ></q-btn>
             <div
-              class="justify-end"
+              class="justify-between"
               style="
                 display: block;
                 padding-left: 25px;
@@ -148,10 +156,22 @@
                 margin: auto;
               "
             >
-              <q-img src="TNCLogoPrimary_RGB.jpg" style="width: 250px" fit="contain" />
-              <q-img src="NE_University.jpg" style="width: 250px" fit="contain" />
-              <q-img src="USGS_logo_green.png" style="width: 250px" fit="contain" />
-              <q-img src="UofA_Stokes.jpg" style="width: 250px" fit="contain" />
+              <q-img
+                src="TNCLogoPrimary_RGB.jpg"
+                style="width: 250px; margin-right: 30px"
+                fit="contain"
+              />
+              <q-img
+                src="NE_University.jpg"
+                style="width: 250px; margin-right: 20px"
+                fit="contain"
+              />
+              <q-img
+                src="USGS_logo_green.png"
+                style="width: 250px; margin-right: 20px"
+                fit="contain"
+              />
+              <q-img src="UofA_Stokes.jpg" style="width: 250px; margin-right: 20px" fit="contain" />
             </div>
           </q-card-section>
         </q-card>
@@ -160,7 +180,7 @@
         v-model="splitterModel"
         unit="px"
         separator-class="bg-primary"
-        :limits="[500]"
+        :limits="[600, Infinity]"
         @update:model-value="updateCondensedTabs($event)"
       >
         <template v-slot:before>
@@ -251,7 +271,7 @@ export default {
   },
   data() {
     return {
-      splitterModel: this.$store.state.config.panelDisplayType == 'plain' ? 500 : 750,
+      splitterModel: this.$store.state.config.panelDisplayType == 'plain' ? 550 : 750,
       splitterModelMobile: this.$store.state.config.panelDisplayType == 'tabsVertical' ? 300 : 400,
       panelScreenSize: 'v-slot:before',
       //for the service worker (pwa update)

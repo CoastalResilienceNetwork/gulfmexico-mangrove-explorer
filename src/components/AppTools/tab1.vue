@@ -1,7 +1,7 @@
 <template>
   <div>
     <q-expansion-item
-      default-opened
+      v-model="expanded1"
       label="Mangrove Distribution in the SE United States"
       dense
       :header-style="{ textAlign: 'center', fontWeight: 'bold' }"
@@ -34,12 +34,10 @@
         </div>
       </div>
     </q-expansion-item>
-  </div>
-  <hr />
-  <div>
+    <q-separator class="q-my-md" />
     <q-expansion-item
       label="Modeling Current and Future Mangroves"
-      default-opened
+      v-model="expanded2"
       dense
       :header-style="{ textAlign: 'center', fontWeight: 'bold' }"
     >
@@ -181,12 +179,10 @@
         </div>
       </div>
     </q-expansion-item>
-  </div>
-  <hr />
-  <div>
+    <q-separator class="q-my-md" />
     <q-expansion-item
       label="Policy and Social Context"
-      default-opened
+      v-model="expanded3"
       dense
       :header-style="{ textAlign: 'center', fontWeight: 'bold' }"
     >
@@ -401,7 +397,9 @@ export default {
       ],
       showInfo: false,
       intensity: '(Recent Climate)',
-      expanded: false
+      expanded1: true,
+      expanded2: true,
+      expanded3: true
     }
   },
   computed: {

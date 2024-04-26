@@ -248,23 +248,23 @@ export default {
         }
       })
     },
-    mangroveLayer() {
-      if (this.mangroveLayer == 'Current') {
-        if (this.layerOption !== []) {
-          this.manageLayerVis(this.layerOption, this.supportingOption)
-        }
-      } else if (this.mangroveLayer == 'Moderate') {
-        if (this.layerOption !== []) {
-          this.manageLayerVis(this.layerOption, this.supportingOption)
-        }
-      } else if (this.mangroveLayer == 'Intense') {
-        if (this.layerOption !== []) {
-          this.manageLayerVis(this.layerOption, this.supportingOption)
-        }
-      } else if (this.mangroveLayer == 'support') {
-        this.mangroveLayer = this.mangroveLayer
-      }
-    },
+    // mangroveLayer() {
+    //   if (this.mangroveLayer == 'Current') {
+    //     if (this.layerOption !== []) {
+    //       this.manageLayerVis(this.layerOption, this.supportingOption)
+    //     }
+    //   } else if (this.mangroveLayer == 'Moderate') {
+    //     if (this.layerOption !== []) {
+    //       this.manageLayerVis(this.layerOption, this.supportingOption)
+    //     }
+    //   } else if (this.mangroveLayer == 'Intense') {
+    //     if (this.layerOption !== []) {
+    //       this.manageLayerVis(this.layerOption, this.supportingOption)
+    //     }
+    //   } else if (this.mangroveLayer == 'support') {
+    //     this.mangroveLayer = this.mangroveLayer
+    //   }
+    // },
     layerSelection() {
       this.updateIntensity(this.sliderValue)
       this.updateMangroveLayerVis(this.layerSelection[0], this.intensity)
@@ -1193,13 +1193,13 @@ export default {
 
     updateSupportingLayerVis(array) {
       esri.mapImageLayer.sublayers.forEach((layer) => {
-        // if (layer.id == 1 || layer.id == 2 || layer.id == 3 || layer.id == 4) {
-        if (array.includes(layer.id) == true) {
-          layer.visible = true
-        } else {
-          layer.visible = false
+        if (layer.id == 1 || layer.id == 2 || layer.id == 3 || layer.id == 4) {
+          if (array.includes(layer.id) == true) {
+            layer.visible = true
+          } else {
+            layer.visible = false
+          }
         }
-        // }
       })
     },
 
@@ -1418,7 +1418,7 @@ export default {
     getDescriptions() {
       let obj = []
       let layDesc = []
-      let suppOp = []
+      // let suppOp = []
       let smnum = this.$store.state.config.forLayerDescriptions.length
       let smcount = 0
       this.$store.state.config.forLayerDescriptions.forEach((service, index) => {
@@ -1484,19 +1484,19 @@ export default {
                 let parentLoc = storeNodes[nodesIndex].parentLoc
                 //push the child to the parent
 
-                if (l.id == 1 || l.id == 2 || l.id == 3) {
-                  suppOp.push({
-                    id: l.id,
-                    title: l.name,
-                    showDesc: false,
-                    description: l.description
-                      .replace('&lt;/a&gt;', '</a>')
-                      .replace('&lt;a', '<a')
-                      .replace('&lt;', '<')
-                      .replace('&gt;', '>')
-                      .replace('STYLE="text-align:Left;font-size:12pt"', '')
-                  })
-                }
+                // if (l.id == 1 || l.id == 2 || l.id == 3) {
+                // suppOp.push({
+                //   id: l.id,
+                //   title: l.name,
+                //   showDesc: false,
+                //   description: l.description
+                //     .replace('&lt;/a&gt;', '</a>')
+                //     .replace('&lt;a', '<a')
+                //     .replace('&lt;', '<')
+                //     .replace('&gt;', '>')
+                //     .replace('STYLE="text-align:Left;font-size:12pt"', '')
+                // })
+                // }
 
                 parentLoc.children.push({
                   label: l.name,
@@ -1582,7 +1582,7 @@ export default {
       })
       this.layerDescriptions = layDesc
 
-      this.supportingOptions = suppOp
+      // this.supportingOptions = suppOp
     }
   }
 }

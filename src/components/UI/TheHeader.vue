@@ -36,9 +36,13 @@
       <span class="text-dark text-bold">Coastal Resilience</span>
       <span class="text-bold text-subtitle1"> Mangrove Explorer</span>
     </span>
-    <!-- <div>
-      <q-btn @click="showHelp = true" padding="none" color="dark" flat icon="help" />
-    </div> -->
+    <div @click="splashDiv = true" v-if="splashDiv == false">
+      <a
+        style="text-color: white; border: none !important; font-size: 20px; cursor: pointer"
+        label="About"
+        >About</a
+      >
+    </div>
   </header>
 
   <!-- INTRO DIALOG -->
@@ -206,6 +210,14 @@ export default {
       },
       set(value) {
         this.$store.commit('updateDescriptionsComplete', value)
+      }
+    },
+    splashDiv: {
+      get() {
+        return this.$store.state.splashDiv
+      },
+      set(value) {
+        this.$store.commit('updateSplashDiv', value)
       }
     }
   }
