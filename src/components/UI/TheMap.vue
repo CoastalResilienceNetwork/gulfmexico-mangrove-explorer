@@ -28,6 +28,16 @@
         width="100%"
         style="margin-top: auto; margin-bottom: auto; display: block"
       />
+      <img
+        v-if="
+          this.socialSelection ==
+          'What do people think about the benefits provided by mangroves versus marshes?'
+        "
+        src="../../assets/SurveyQ3.jpg"
+        height="100%"
+        width="100%"
+        style="margin-top: auto; margin-bottom: auto; display: block"
+      />
       <!-- <q-btn
         width="100px"
         height="100px"

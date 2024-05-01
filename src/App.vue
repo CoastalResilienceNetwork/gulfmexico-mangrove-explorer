@@ -147,7 +147,7 @@
               size="lg"
             ></q-btn>
             <div
-              class="justify-between"
+              class="justify-between items-center"
               style="
                 display: block;
                 padding-left: 25px;

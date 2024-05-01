@@ -245,7 +245,8 @@
         <div>
           We surveyed four communities in mangrove expansion areas (Corpus Christi, Galveston,
           Panama City Beach, and Cedar Key) to explore how people in these communities perceive
-          mangroves changing and how they think the change should be managed.
+          mangroves changing, how they think the change should be managed, and if they think
+          mangroves or marshes provide more benefits to people.
         </div>
       </div>
       <div v-for="option in socialOptions" :key="option" class="q-mx-lg">
@@ -344,10 +345,6 @@ export default {
       //   }
       // ],
       socialOptions: [
-        // {
-        //   label: 'Where are mangroves protected by state law?',
-        //   value: 'Where are mangroves protected by state law?',
-        // },
         {
           label: 'What do people think is driving mangrove change in expansion areas?',
           value: 'What do people think is driving mangrove change in expansion areas?',
@@ -357,13 +354,12 @@ export default {
           label: 'What actions do people think need to be taken for mangroves in expansion areas?',
           value: 'What actions do people think need to be taken for mangroves in expansion areas?',
           id: 28
+        },
+        {
+          label: 'What do people think about the benefits provided by mangroves versus marshes?',
+          value: 'What do people think about the benefits provided by mangroves versus marshes?',
+          id: 28
         }
-        // {
-        //   label:
-        //     'How do people in mangrove expansion areas perceive the benefits provided by marshes versus mangroves?',
-        //   value:
-        //     'How do people in mangrove expansion areas perceive the benefits provided by marshes versus mangroves?'
-        // }
       ],
       stateLawLayer: [
         {
@@ -500,7 +496,6 @@ export default {
     },
     supportingOptions() {
       if (this.supportingOptions) {
-        console.log(this.supportingOptions)
         this.expanded = true
       }
     }
