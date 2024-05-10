@@ -653,12 +653,11 @@ export default {
         },
         {
           id: 29,
-          title:
-            'How do people in mangrove expansion areas perceive the benefits provided by marshes versus mangroves?',
+          title: 'Community Survey Locations',
           visible: false,
           intensity: undefined,
           opacity: 0.8,
-          legendEnabled: false
+          question: 'What do people think about the benefits provided by mangroves versus marshes?'
         },
         {
           id: 30,
@@ -1268,6 +1267,15 @@ export default {
             } else if (
               title ==
               'What actions do people think need to be taken for mangroves in expansion areas?'
+            ) {
+              this.zoomToSocial()
+              if (layer.question == title) {
+                layer.visible = true
+                this.lastSocial = layer.id
+              }
+            } else if (
+              title ==
+              'What do people think about the benefits provided by mangroves versus marshes?'
             ) {
               this.zoomToSocial()
               if (layer.question == title) {

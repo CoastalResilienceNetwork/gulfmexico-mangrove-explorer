@@ -173,7 +173,10 @@
         <div v-if="option.showDesc == true">
           <div v-for="desc in this.layerDescriptions" :key="desc">
             <div v-if="desc.title.includes(option.value + ' ' + this.intensity) == true">
-              <p v-html="desc.description" style="font-size: small"></p>
+              <p
+                v-html="desc.description"
+                style="font-size: small; margin-bottom: 0px !important"
+              ></p>
             </div>
           </div>
         </div>
@@ -358,7 +361,7 @@ export default {
         {
           label: 'What do people think about the benefits provided by mangroves versus marshes?',
           value: 'What do people think about the benefits provided by mangroves versus marshes?',
-          id: 28
+          id: 29
         }
       ],
       stateLawLayer: [
