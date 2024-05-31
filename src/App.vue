@@ -7,9 +7,9 @@
   <div>
     <div v-if="splashDiv == true">
       <div id="splash-screen" v-if="smallScreen && splashDiv == true">
-        <div>
+        <div style="height: fit-content !important; width: auto">
           <q-img src="MangroveMap.jpg" style="height: 100vh; width: 100%; overflow-y: scroll">
-            <div class="absolute-full text-subtitle2">
+            <div class="absolute-full text-subtitle2" style="height: fit-content; width: auto">
               <!-- <div class="text-h3 text-center" style="margin: 15px">About Mangrove Explorer</div> -->
               <div style="font-weight: 300; font-size: large; padding: 25px; line-height: normal">
                 Welcome to the Mangrove Explorer Mapping Tool. The Mangrove Explorer was created by
@@ -19,17 +19,31 @@
                 frequency and intensity of freeze events that damage or kill mangroves. However, as
                 climate change reduces the number of freeze events, mangroves are establishing in
                 areas north of their historic range. <br /><br />
-                The Mangrove Explorer depicts the most current (2022) distribution of mangroves as
+                The Mangrove Explorer depicts the most current (2021) distribution of mangroves as
                 well as the projections of the future distribution and characteristics of mangroves
                 under future temperature and precipitation conditions. Other factors that will
                 influence the future distribution, such as policy and coastal management, are also
                 explored on the tool. It is extremely important to note that these projections only
                 depict where mangroves could expand with warming temperatures and do NOT consider
-                the devastating impacts of sea level rise on all coastal wetlands (including
-                mangroves). Future work is needed to address this impact in the Mangrove Explorer.
-                For now, the maps provide the user with a glimpse into the future where mangroves
-                will likely expand across the majority of the upper Gulf of Mexico and up the east
-                coast into the Carolinas by the Year 2100.
+                the impacts of sea level rise on all coastal wetlands (including mangroves). Sea
+                level rise is expected to lead to wetland loss in some places and also landward
+                migration of coastal wetlands into adjacent upland and upriver ecosystems. Future
+                work is needed to address this impact in the Mangrove Explorer. For now, the maps
+                provide the user with a glimpse into the future where mangroves will likely expand
+                across the majority of the upper Gulf of Mexico and up the east coast into South
+                Carolina by the Year 2100. To view the data behind this project please visit:
+                <a
+                  target="_blank"
+                  href="https://www.sciencebase.gov/catalog/item/6515c966d34e469cabfcdc88"
+                  >Sciencebase.gov</a
+                ><br /><br />
+                For more information about The Nature Conservancy and partner efforts in the region
+                please visit:
+                <a
+                  target="_blank"
+                  href="https://www.nature.org/en-us/what-we-do/our-priorities/protect-water-and-land/land-and-water-stories/us-mangroves-conservation/?vu=usmangroves"
+                  >TNC | Ensuring a Future for Mangroves in the U.S.</a
+                >
               </div>
               <div>
                 <q-btn
@@ -114,20 +128,26 @@
               intensity of freeze events that damage or kill mangroves. However, as climate change
               reduces the number of freeze events, mangroves are establishing in areas north of
               their historic range. <br /><br />
-              The Mangrove Explorer depicts the most current (2022) distribution of mangroves as
+              The Mangrove Explorer depicts the most current (2021) distribution of mangroves as
               well as the projections of the future distribution and characteristics of mangroves
               under future temperature and precipitation conditions. Other factors that will
               influence the future distribution, such as policy and coastal management, are also
               explored on the tool. It is extremely important to note that these projections only
               depict where mangroves could expand with warming temperatures and do NOT consider the
-              devastating impacts of sea level rise on all coastal wetlands (including mangroves).
-              Future work is needed to address this impact in the Mangrove Explorer. For now, the
-              maps provide the user with a glimpse into the future where mangroves will likely
-              expand across the majority of the upper Gulf of Mexico and up the east coast into the
-              Carolinas by the Year 2100.<br />
-              <br />
+              impacts of sea level rise on all coastal wetlands (including mangroves). Sea level
+              rise is expected to lead to wetland loss in some places and also landward migration of
+              coastal wetlands into adjacent upland and upriver ecosystems. Future work is needed to
+              address this impact in the Mangrove Explorer. For now, the maps provide the user with
+              a glimpse into the future where mangroves will likely expand across the majority of
+              the upper Gulf of Mexico and up the east coast into South Carolina by the Year 2100.
+              To view the data behind this project please visit:
+              <a
+                target="_blank"
+                href="https://www.sciencebase.gov/catalog/item/6515c966d34e469cabfcdc88"
+                >Sciencebase.gov</a
+              ><br /><br />
               For more information about The Nature Conservancy and partner efforts in the region
-              please visit:<br />
+              please visit:
               <a
                 target="_blank"
                 href="https://www.nature.org/en-us/what-we-do/our-priorities/protect-water-and-land/land-and-water-stories/us-mangroves-conservation/?vu=usmangroves"

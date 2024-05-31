@@ -661,178 +661,191 @@ export default {
         },
         {
           id: 30,
-          title: 'Perceptions are consistent that mangroves are better',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8,
-          legendEnabled: false
-        },
-        {
-          id: 31,
-          title: 'Providing nesting platforms for birds',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8,
-          legendEnabled: false
-        },
-        {
-          id: 32,
-          title: 'Recovering from freeze events',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8,
-          legendEnabled: false
-        },
-        {
-          id: 33,
-          title: 'Providing nectar flowers for honey production',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8,
-          legendEnabled: false
-        },
-        {
-          id: 34,
-          title: 'Stabilizing sediments and jumpstarting coastal restoration efforts',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8,
-          legendEnabled: false
-        },
-        {
-          id: 35,
-          title: 'Recovering from extreme flooding',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8,
-          legendEnabled: false
-        },
-        {
-          id: 36,
-          title: 'Improving water quality',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8,
-          legendEnabled: false
-        },
-        {
-          id: 37,
-          title: 'Perceptions are consistent that marshes are better',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8,
-          legendEnabled: false
-        },
-        {
-          id: 38,
-          title: 'Recovery from hurricanes',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8,
-          legendEnabled: false
-        },
-        {
-          id: 39,
-          title: 'Supporting coastal fisheries',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8,
-          legendEnabled: false
-        },
-        {
-          id: 40,
-          title: 'Providing desirable views of the coast',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8,
-          legendEnabled: false
-        },
-        {
-          id: 41,
-          title: 'Reducing wind speeds',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8,
-          legendEnabled: false
-        },
-        {
-          id: 42,
-          title: 'Providing access to fishing areas',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8,
-          legendEnabled: false
-        },
-        {
-          id: 43,
-          title: 'Responding to sea level rise',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8,
-          legendEnabled: false
-        },
-        {
-          id: 44,
-          title: 'Perceptions of whether marshes or mangroves are better is consistently mixed',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8,
-          legendEnabled: false
-        },
-        {
-          id: 45,
-          title: 'Preventing coastal erosion',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8,
-          legendEnabled: false
-        },
-        {
-          id: 46,
-          title: 'Providing habitat for birds',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8,
-          legendEnabled: false
-        },
-        {
-          id: 47,
-          title: 'Perceptions of whether marshes or mangroves are better vary by location',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8,
-          legendEnabled: false
-        },
-        {
-          id: 48,
-          title: 'Protecting the coast during storms',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8,
-          legendEnabled: false
-        },
-        {
-          id: 49,
           title: 'Supporting Layers',
           visible: false,
           intensity: undefined,
-          opacity: 0.8,
-          legendEnabled: false
+          opacity: 0.8
         },
         {
-          id: 50,
+          id: 31,
           title: 'Tidal Wetland Complexes',
           visible: false,
           intensity: undefined,
           opacity: 0.8
         },
         {
-          id: 51,
+          id: 32,
           title: 'Inland Wetland Migration Space',
           visible: false,
           intensity: undefined,
           opacity: 0.8
         },
+        // {
+        //   id: 31,
+        //   title: 'Providing nesting platforms for birds',
+        //   visible: false,
+        //   intensity: undefined,
+        //   opacity: 0.8,
+        //   legendEnabled: false
+        // },
+        // {
+        //   id: 32,
+        //   title: 'Recovering from freeze events',
+        //   visible: false,
+        //   intensity: undefined,
+        //   opacity: 0.8,
+        //   legendEnabled: false
+        // },
+        // {
+        //   id: 33,
+        //   title: 'Providing nectar flowers for honey production',
+        //   visible: false,
+        //   intensity: undefined,
+        //   opacity: 0.8,
+        //   legendEnabled: false
+        // },
+        // {
+        //   id: 34,
+        //   title: 'Stabilizing sediments and jumpstarting coastal restoration efforts',
+        //   visible: false,
+        //   intensity: undefined,
+        //   opacity: 0.8,
+        //   legendEnabled: false
+        // },
+        // {
+        //   id: 35,
+        //   title: 'Recovering from extreme flooding',
+        //   visible: false,
+        //   intensity: undefined,
+        //   opacity: 0.8,
+        //   legendEnabled: false
+        // },
+        // {
+        //   id: 36,
+        //   title: 'Improving water quality',
+        //   visible: false,
+        //   intensity: undefined,
+        //   opacity: 0.8,
+        //   legendEnabled: false
+        // },
+        // {
+        //   id: 37,
+        //   title: 'Perceptions are consistent that marshes are better',
+        //   visible: false,
+        //   intensity: undefined,
+        //   opacity: 0.8,
+        //   legendEnabled: false
+        // },
+        // {
+        //   id: 38,
+        //   title: 'Recovery from hurricanes',
+        //   visible: false,
+        //   intensity: undefined,
+        //   opacity: 0.8,
+        //   legendEnabled: false
+        // },
+        // {
+        //   id: 39,
+        //   title: 'Supporting coastal fisheries',
+        //   visible: false,
+        //   intensity: undefined,
+        //   opacity: 0.8,
+        //   legendEnabled: false
+        // },
+        // {
+        //   id: 40,
+        //   title: 'Providing desirable views of the coast',
+        //   visible: false,
+        //   intensity: undefined,
+        //   opacity: 0.8,
+        //   legendEnabled: false
+        // },
+        // {
+        //   id: 41,
+        //   title: 'Reducing wind speeds',
+        //   visible: false,
+        //   intensity: undefined,
+        //   opacity: 0.8,
+        //   legendEnabled: false
+        // },
+        // {
+        //   id: 42,
+        //   title: 'Providing access to fishing areas',
+        //   visible: false,
+        //   intensity: undefined,
+        //   opacity: 0.8,
+        //   legendEnabled: false
+        // },
+        // {
+        //   id: 43,
+        //   title: 'Responding to sea level rise',
+        //   visible: false,
+        //   intensity: undefined,
+        //   opacity: 0.8,
+        //   legendEnabled: false
+        // },
+        // {
+        //   id: 44,
+        //   title: 'Perceptions of whether marshes or mangroves are better is consistently mixed',
+        //   visible: false,
+        //   intensity: undefined,
+        //   opacity: 0.8,
+        //   legendEnabled: false
+        // },
+        // {
+        //   id: 45,
+        //   title: 'Preventing coastal erosion',
+        //   visible: false,
+        //   intensity: undefined,
+        //   opacity: 0.8,
+        //   legendEnabled: false
+        // },
+        // {
+        //   id: 46,
+        //   title: 'Providing habitat for birds',
+        //   visible: false,
+        //   intensity: undefined,
+        //   opacity: 0.8,
+        //   legendEnabled: false
+        // },
+        // {
+        //   id: 47,
+        //   title: 'Perceptions of whether marshes or mangroves are better vary by location',
+        //   visible: false,
+        //   intensity: undefined,
+        //   opacity: 0.8,
+        //   legendEnabled: false
+        // },
+        // {
+        //   id: 48,
+        //   title: 'Protecting the coast during storms',
+        //   visible: false,
+        //   intensity: undefined,
+        //   opacity: 0.8,
+        //   legendEnabled: false
+        // },
+        // {
+        //   id: 49,
+        //   title: 'Supporting Layers',
+        //   visible: false,
+        //   intensity: undefined,
+        //   opacity: 0.8,
+        //   legendEnabled: false
+        // },
+        // {
+        //   id: 50,
+        //   title: 'Tidal Wetland Complexes',
+        //   visible: false,
+        //   intensity: undefined,
+        //   opacity: 0.8
+        // },
+        // {
+        //   id: 51,
+        //   title: 'Inland Wetland Migration Space',
+        //   visible: false,
+        //   intensity: undefined,
+        //   opacity: 0.8
+        // },
         {
           id: 6,
           title: 'Mangrove Presence (Recent Climate)',
