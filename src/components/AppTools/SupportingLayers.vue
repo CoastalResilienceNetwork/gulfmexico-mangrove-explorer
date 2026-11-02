@@ -148,6 +148,7 @@ export default {
         tickedObj.push({
           mapServiceIndex: layerInfo[1],
           id: layerInfo[0],
+          layerName: node.label,
           type: type
         })
       })
@@ -167,10 +168,12 @@ export default {
   methods: {
     setTransparency(value, id, type) {
       let layerInfo = id.split('_')
+      let node = this.$refs.tree.getNodeByKey(id)
       let layerObj = {
         value: value,
         id: layerInfo[0],
         mapServiceIndex: layerInfo[1],
+        layerName: node.label,
         type: type
       }
       this.$store.commit('updateSupportingLayerVisibleOpacity', layerObj)

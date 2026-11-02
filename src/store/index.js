@@ -10,14 +10,42 @@ export default createStore({
     },
     config: {
       // config info
+      services: {
+        vectorFeatureService:
+          'https://services.arcgis.com/F7DSX1DSNSiWmOqh/arcgis/rest/services/Mangrove_Explorer_Private/FeatureServer',
+        rasterMapService:
+          'https://cumulus-ags.tnc.org/arcgis/rest/services/nascience/CCS_Rasters_1/MapServer'
+      },
+      supportingSelectionLayerNames: [
+        'Mangrove Presence and Absence (based on expert input 2023)',
+        'Mangrove Expansion Zones',
+        'Potential Change in Mangrove Presence by 2100'
+      ],
+      subSocialLayerNameGroups: {
+        mangroveBetter: [
+          'Providing nesting platforms for birds',
+          'Recovering from freeze events',
+          'Providing nectar flowers for honey production',
+          'Stabilizing sediments and jumpstarting coastal restoration efforts',
+          'Recovering from extreme flooding',
+          'Improving water quality'
+        ],
+        marshBetter: [
+          'Recovery from hurricanes',
+          'Supporting coastal fisheries',
+          'Providing desirable views of the coast',
+          'Reducing wind speeds',
+          'Providing access to fishing areas',
+          'Responding to sea level rise'
+        ],
+        mixed: ['Preventing coastal erosion', 'Providing habitat for birds'],
+        varyByLocation: ['Protecting the coast during storms']
+      },
       supportingMapLayers: [
         {
           mapService:
-            'https://cirrus.tnc.org/arcgis/rest/services/Mangrove_Explorer/Mangrove_Explorer_Private/MapServer',
-          skipLayers: [
-            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
-            24, 25, 26, 27, 28, 29
-          ],
+            'https://services.arcgis.com/F7DSX1DSNSiWmOqh/arcgis/rest/services/Mangrove_Explorer_Private/FeatureServer',
+          includeLayerNames: ['Tidal Wetland Complexes', 'Inland Wetland Migration Space'],
           title: 'Mangrove Explorer',
           popupTemplate: [
             {
@@ -39,7 +67,27 @@ export default createStore({
       forLayerDescriptions: [
         {
           mapService:
-            'https://cirrus.tnc.org/arcgis/rest/services/Mangrove_Explorer/Mangrove_Explorer_Private/MapServer',
+            'https://services.arcgis.com/F7DSX1DSNSiWmOqh/arcgis/rest/services/Mangrove_Explorer_Private/FeatureServer',
+          skipLayers: [],
+          title: 'Mangrove Explorer',
+          popupTemplate: [
+            {
+              id: 9999,
+              fields: [
+                { fieldName: 'Subbasin', label: 'Sub Basin' },
+                { fieldName: 'SubbasinR', label: 'Sub Basin R' },
+                { fieldName: 'AreaC', label: 'Area(units)' }
+              ]
+            },
+            {
+              id: 9999,
+              fields: [{ fieldName: 'none', label: 'placeholder' }]
+            }
+          ]
+        },
+        {
+          mapService:
+            'https://cumulus-ags.tnc.org/arcgis/rest/services/nascience/CCS_Rasters_1/MapServer',
           skipLayers: [],
           title: 'Mangrove Explorer',
           popupTemplate: [
@@ -81,7 +129,7 @@ export default createStore({
     mangroveLayer: '',
     layerSelection: ['None'],
     climaticSelection: ['None'],
-    supportingSelection: [1],
+    supportingSelection: ['Mangrove Presence and Absence (based on expert input 2023)'],
     socialSelection: ['None'],
     subSocialSelection: ['None'],
     sliderValue: 0,
@@ -205,19 +253,15 @@ export default createStore({
             })
 
             let storeNodes = []
-            let type = ''
             layerJson.forEach((l) => {
-              service.popupTemplate.forEach((popup) => {
-                if (l.id == popup.id) {
-                  type = 'Featue Layer'
-                } else type = 'Raster Layer'
-              })
-
-              if (l.id == 1 || l.id == 2 || l.id == 3) {
+              let type = l.type == 'Feature Layer' ? 'Feature Layer' : 'Raster Layer'
+              let normalizedName = (l.name || '').trim()
+              if (context.state.config.supportingSelectionLayerNames.includes(normalizedName)) {
                 let layLength = context.state.supportingOptions.length
                 let o = {
-                  id: l.id,
-                  title: l.name,
+                  id: normalizedName,
+                  title: normalizedName,
+                  value: normalizedName,
                   showDesc: false,
                   description: l.description
                     .replace('&lt;/a&gt;', '</a>')
@@ -232,14 +276,20 @@ export default createStore({
                 }
               }
 
-              // add layer to layer viewer if it's id is not present in the skip array
-              if (service.skipLayers.indexOf(l.id) == -1) {
+              let includeLayer = true
+              if (Array.isArray(service.includeLayerNames) && service.includeLayerNames.length > 0) {
+                includeLayer = service.includeLayerNames.includes(normalizedName)
+              } else if (Array.isArray(service.skipLayers) && service.skipLayers.length > 0) {
+                includeLayer = service.skipLayers.indexOf(l.id) == -1
+              }
+
+              if (includeLayer) {
                 // Group Layer with no parent
                 if (l.type == 'Group Layer' && !l.parentLayer) {
                   //push the object to the list as child of main header
 
                   obj[index].children.push({
-                    label: l.name,
+                    label: normalizedName,
                     children: [],
                     id: l.id + '_' + index,
                     noTick: true,
@@ -272,7 +322,7 @@ export default createStore({
                   let parentLoc = storeNodes[nodesIndex].parentLoc
                   //push the child to the parent
                   parentLoc.children.push({
-                    label: l.name,
+                    label: normalizedName,
                     children: [],
                     body: 'toggle',
                     id: l.id + '_' + index,
@@ -295,7 +345,7 @@ export default createStore({
                   //push the new parent into the found parent as child
 
                   parentLoc.children.push({
-                    label: l.name,
+                    label: normalizedName,
                     children: [],
                     id: l.id + '_' + index,
                     noTick: true,
@@ -323,7 +373,7 @@ export default createStore({
                 // feature layer with no parent length = number of nodes
                 if (l.type !== 'Group Layer' && !l.parentLayer) {
                   obj[index].children.push({
-                    label: l.name,
+                    label: normalizedName,
                     children: [],
                     body: 'toggle',
                     id: l.id + '_' + index,

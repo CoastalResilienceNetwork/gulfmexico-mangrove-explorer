@@ -10,7 +10,7 @@
         <q-checkbox
           size="sm"
           v-model="this.supportingSelection"
-          :val="option.id"
+          :val="option.value"
           :label="option.title"
           toggle-order="tf"
         ></q-checkbox>

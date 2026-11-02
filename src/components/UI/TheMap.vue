@@ -77,6 +77,11 @@ let esri = {
   measurement: '',
   lgExpand: '',
   mapImageLayer: '',
+  managedLayersByName: {},
+  supportingLayerNames: [],
+  climateLayerNames: [],
+  modelLayerNames: [],
+  socialQuestionLayerNames: [],
   socialExpand: '',
   socialContent: {
     title: '',
@@ -93,7 +98,7 @@ export default {
   data() {
     return {
       active: true,
-      previousMangroveLayer: 6,
+      previousMangroveLayer: '',
       previousClimaticLayer: '',
       intensity: '',
       subLegendInfo: false,
@@ -248,13 +253,10 @@ export default {
       this.changeMangroveLayers()
     },
     supportingOption() {
-      esri.mapImageLayer.sublayers.forEach((layer) => {
-        if (layer.slider == 'support') {
-          if (this.supportingOption.includes(layer.title) == true) {
-            layer.visible = true
-          } else {
-            layer.visible = false
-          }
+      Object.keys(esri.managedLayersByName).forEach((name) => {
+        let layer = esri.managedLayersByName[name]
+        if (layer.supportingSelection === true) {
+          layer.visible = this.supportingOption.includes(layer.title) == true
         }
       })
     },
@@ -298,7 +300,7 @@ export default {
     }
   },
 
-  mounted() {
+  async mounted() {
     // Get info button descriptions
 
     this.getDescriptions()
@@ -328,54 +330,44 @@ export default {
 
     //add supporting map layers listed in config
     this.$store.state.config.supportingMapLayers.forEach((service) => {
-      let l = new MapImageLayer({
-        url: service.mapService
-      })
-      esri.map.add(l)
-      l.when(function () {
-        //create sublayer list
-        let sublayerList = []
-        let layer = esri.map.layers.items.find((layer) => {
-          return layer.type == 'map-image' && layer.url == service.mapService
+      if (service.mapService.includes('/MapServer')) {
+        let l = new MapImageLayer({
+          url: service.mapService
         })
-        // console.log(layer) //todo figure out why layer.sublayers is not working
-
-        l.allSublayers.items.forEach((sublayer) => {
-          //see if popup template recrod exists...
-          let popups = service.popupTemplate
-          let layerConfig = popups.find(({ id }) => id == sublayer.id)
-          //if the template is configured
-          if (layerConfig) {
-            //create template
-            let fieldInfos = layerConfig.fields
-            let template = {
-              actions: [],
-              content: [
-                {
-                  type: 'fields',
-                  fieldInfos: fieldInfos
-                }
-              ]
+        esri.map.add(l)
+        l.when(function () {
+          let sublayerList = []
+          l.allSublayers.items.forEach((sublayer) => {
+            let popups = service.popupTemplate
+            let layerConfig = popups.find(({ id }) => id == sublayer.id)
+            if (layerConfig) {
+              let fieldInfos = layerConfig.fields
+              let template = {
+                actions: [],
+                content: [
+                  {
+                    type: 'fields',
+                    fieldInfos: fieldInfos
+                  }
+                ]
+              }
+              sublayerList.push({
+                id: sublayer.id,
+                visible: false,
+                opacity: 1,
+                popupTemplate: template
+              })
+            } else {
+              sublayerList.push({
+                id: sublayer.id,
+                visible: false,
+                opacity: 1
+              })
             }
-            sublayerList.push({
-              id: sublayer.id,
-              visible: false,
-              opacity: 1,
-              popupTemplate: template
-            })
-            console.log(sublayer.id, layerConfig.fields)
-          }
-          //if there is no popup push without a template
-          else {
-            sublayerList.push({
-              id: sublayer.id,
-              visible: false,
-              opacity: 1
-            })
-          }
+          })
+          l.sublayers = sublayerList
         })
-        l.sublayers = sublayerList
-      })
+      }
     })
 
     //code to add highlight feature for map image layer
@@ -522,579 +514,247 @@ export default {
     // move zoom controls to top right
     esri.mapView.ui.move(['zoom'], 'top-right')
 
-    // add mapimagelayer and sublayer
-    esri.mapImageLayer = new MapImageLayer({
-      url: 'https://cirrus.tnc.org/arcgis/rest/services/Mangrove_Explorer/Mangrove_Explorer_Private/MapServer',
-      title: 'Mangrove Explorer',
-      sublayers: [
+    try {
+      await this.initializeManagedLayers()
+    } catch (error) {
+      console.error(error)
+      return
+    }
+  },
+
+  methods: {
+    normalizeLayerName(name) {
+      return (name || '').trim()
+    },
+
+    getManagedLayerConfigs() {
+      return [
         {
-          id: 19,
-          title: 'Extreme Minimum Temperature (Recent Climate)',
-          visible: false,
+          name: 'Extreme Minimum Temperature (Recent Climate)',
+          source: 'raster',
           intensity: 'Current',
+          visible: false,
           opacity: 0.8
         },
         {
-          id: 20,
-          title: 'Extreme Minimum Temperature (Future Moderate Climate)',
-          visible: false,
+          name: 'Extreme Minimum Temperature (Future Moderate Climate)',
+          source: 'raster',
           intensity: 'Moderate',
+          visible: false,
           opacity: 0.8
         },
         {
-          id: 21,
-          title: 'Extreme Minimum Temperature (Future Severe Climate)',
-          visible: false,
+          name: 'Extreme Minimum Temperature (Future Severe Climate)',
+          source: 'raster',
           intensity: 'Intense',
+          visible: false,
           opacity: 0.8
         },
         {
-          id: 22,
-          title: 'Mean Annual Precipitation (Recent Climate)',
-          visible: false,
+          name: 'Mean Annual Precipitation (Recent Climate)',
+          source: 'raster',
           intensity: 'Current',
+          visible: false,
           opacity: 0.8
         },
         {
-          id: 23,
-          title: 'Mean Annual Precipitation (Future Moderate Climate)',
-          visible: false,
+          name: 'Mean Annual Precipitation (Future Moderate Climate)',
+          source: 'raster',
           intensity: 'Moderate',
+          visible: false,
           opacity: 0.8
         },
         {
-          id: 24,
-          title: 'Mean Annual Precipitation (Future Severe Climate)',
-          visible: false,
+          name: 'Mean Annual Precipitation (Future Severe Climate)',
+          source: 'raster',
           intensity: 'Intense',
-          opacity: 0.8
-        },
-        {
-          id: 0,
-          title: 'Mangrove Distribution in the SE United States',
           visible: false,
-          intensity: undefined,
           opacity: 0.8
         },
         {
-          id: 1,
-          // title: 'Mangrove Presence and Absence (based on expert input 2023)',
+          name: 'Mangrove Presence and Absence (based on expert input 2023)',
+          source: 'vector',
           visible: true,
-          intensity: undefined,
-          opacity: 0.8
-        },
-        {
-          id: 2,
-          // title: 'Mangrove Expansion Zones',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8
-        },
-        {
-          id: 3,
-          // title: 'Potential Change in Mangrove Presence by 2100',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8
-        },
-        {
-          id: 4,
-          title: 'Modeling Current and Future Mangroves',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8
-        },
-        {
-          id: 5,
-          title: 'Current and Future Mangroves',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8
-        },
-        {
-          id: 18,
-          title: 'Climatic Drivers of Mangrove Change',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8
-        },
-        {
-          id: 25,
-          title: 'Policy and Social Context',
-          visible: false,
-          intensity: undefined,
           opacity: 0.8,
-          legendEnabled: false
+          supportingSelection: true
         },
         {
-          id: 26,
-          title: 'Where are mangroves protected by state law?',
+          name: 'Mangrove Expansion Zones',
+          source: 'vector',
           visible: false,
-          intensity: undefined,
+          opacity: 0.8,
+          supportingSelection: true
+        },
+        {
+          name: 'Potential Change in Mangrove Presence by 2100',
+          source: 'vector',
+          visible: false,
+          opacity: 0.8,
+          supportingSelection: true
+        },
+        { name: 'Mangrove Presence (Recent Climate)', source: 'vector', intensity: 'Current', visible: false, opacity: 0.8 },
+        { name: 'Mangrove Presence (Future Moderate Climate)', source: 'vector', intensity: 'Moderate', visible: false, opacity: 0.8 },
+        { name: 'Mangrove Presence (Future Severe Climate)', source: 'vector', intensity: 'Intense', visible: false, opacity: 0.8 },
+        { name: 'Mangrove Relative Abundance (Recent Climate)', source: 'vector', intensity: 'Current', visible: false, opacity: 0.8 },
+        { name: 'Mangrove Relative Abundance (Future Moderate Climate)', source: 'vector', intensity: 'Moderate', visible: false, opacity: 0.8 },
+        { name: 'Mangrove Relative Abundance (Future Severe Climate)', source: 'vector', intensity: 'Intense', visible: false, opacity: 0.8 },
+        { name: 'Aboveground Biomass (Recent Climate)', source: 'vector', intensity: 'Current', visible: false, opacity: 0.8 },
+        { name: 'Aboveground Biomass (Future Moderate Climate)', source: 'vector', intensity: 'Moderate', visible: false, opacity: 0.8 },
+        { name: 'Aboveground Biomass (Future Severe Climate)', source: 'vector', intensity: 'Intense', visible: false, opacity: 0.8 },
+        { name: 'Wetland Vegetation Height (Recent Climate)', source: 'vector', intensity: 'Current', visible: false, opacity: 0.8 },
+        { name: 'Wetland Vegetation Height (Future Moderate Climate)', source: 'vector', intensity: 'Moderate', visible: false, opacity: 0.8 },
+        { name: 'Wetland Vegetation Height (Future Severe Climate)', source: 'vector', intensity: 'Intense', visible: false, opacity: 0.8 },
+        {
+          name: 'Where are mangroves protected by state law?',
+          source: 'vector',
+          visible: false,
           opacity: 0.8,
           question: 'Where are mangroves protected by state law?'
         },
         {
-          id: 27,
-          title: 'Community Survey Locations',
+          name: 'What do people think is driving mangrove change in expansion areas?',
+          source: 'vector',
           visible: false,
-          intensity: undefined,
           opacity: 0.8,
           question: 'What do people think is driving mangrove change in expansion areas?'
         },
         {
-          id: 28,
-          title: 'Community Survey Locations',
+          name: 'What actions do people think need to be taken for mangroves in expansion areas?',
+          source: 'vector',
           visible: false,
-          intensity: undefined,
           opacity: 0.8,
-          question:
-            'What actions do people think need to be taken for mangroves in expansion areas?'
+          question: 'What actions do people think need to be taken for mangroves in expansion areas?'
         },
-        {
-          id: 29,
-          title: 'Community Survey Locations',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8,
-          question: 'What do people think about the benefits provided by mangroves versus marshes?'
-        },
-        {
-          id: 30,
-          title: 'Supporting Layers',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8
-        },
-        {
-          id: 31,
-          title: 'Tidal Wetland Complexes',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8
-        },
-        {
-          id: 32,
-          title: 'Inland Wetland Migration Space',
-          visible: false,
-          intensity: undefined,
-          opacity: 0.8
-        },
-        // {
-        //   id: 31,
-        //   title: 'Providing nesting platforms for birds',
-        //   visible: false,
-        //   intensity: undefined,
-        //   opacity: 0.8,
-        //   legendEnabled: false
-        // },
-        // {
-        //   id: 32,
-        //   title: 'Recovering from freeze events',
-        //   visible: false,
-        //   intensity: undefined,
-        //   opacity: 0.8,
-        //   legendEnabled: false
-        // },
-        // {
-        //   id: 33,
-        //   title: 'Providing nectar flowers for honey production',
-        //   visible: false,
-        //   intensity: undefined,
-        //   opacity: 0.8,
-        //   legendEnabled: false
-        // },
-        // {
-        //   id: 34,
-        //   title: 'Stabilizing sediments and jumpstarting coastal restoration efforts',
-        //   visible: false,
-        //   intensity: undefined,
-        //   opacity: 0.8,
-        //   legendEnabled: false
-        // },
-        // {
-        //   id: 35,
-        //   title: 'Recovering from extreme flooding',
-        //   visible: false,
-        //   intensity: undefined,
-        //   opacity: 0.8,
-        //   legendEnabled: false
-        // },
-        // {
-        //   id: 36,
-        //   title: 'Improving water quality',
-        //   visible: false,
-        //   intensity: undefined,
-        //   opacity: 0.8,
-        //   legendEnabled: false
-        // },
-        // {
-        //   id: 37,
-        //   title: 'Perceptions are consistent that marshes are better',
-        //   visible: false,
-        //   intensity: undefined,
-        //   opacity: 0.8,
-        //   legendEnabled: false
-        // },
-        // {
-        //   id: 38,
-        //   title: 'Recovery from hurricanes',
-        //   visible: false,
-        //   intensity: undefined,
-        //   opacity: 0.8,
-        //   legendEnabled: false
-        // },
-        // {
-        //   id: 39,
-        //   title: 'Supporting coastal fisheries',
-        //   visible: false,
-        //   intensity: undefined,
-        //   opacity: 0.8,
-        //   legendEnabled: false
-        // },
-        // {
-        //   id: 40,
-        //   title: 'Providing desirable views of the coast',
-        //   visible: false,
-        //   intensity: undefined,
-        //   opacity: 0.8,
-        //   legendEnabled: false
-        // },
-        // {
-        //   id: 41,
-        //   title: 'Reducing wind speeds',
-        //   visible: false,
-        //   intensity: undefined,
-        //   opacity: 0.8,
-        //   legendEnabled: false
-        // },
-        // {
-        //   id: 42,
-        //   title: 'Providing access to fishing areas',
-        //   visible: false,
-        //   intensity: undefined,
-        //   opacity: 0.8,
-        //   legendEnabled: false
-        // },
-        // {
-        //   id: 43,
-        //   title: 'Responding to sea level rise',
-        //   visible: false,
-        //   intensity: undefined,
-        //   opacity: 0.8,
-        //   legendEnabled: false
-        // },
-        // {
-        //   id: 44,
-        //   title: 'Perceptions of whether marshes or mangroves are better is consistently mixed',
-        //   visible: false,
-        //   intensity: undefined,
-        //   opacity: 0.8,
-        //   legendEnabled: false
-        // },
-        // {
-        //   id: 45,
-        //   title: 'Preventing coastal erosion',
-        //   visible: false,
-        //   intensity: undefined,
-        //   opacity: 0.8,
-        //   legendEnabled: false
-        // },
-        // {
-        //   id: 46,
-        //   title: 'Providing habitat for birds',
-        //   visible: false,
-        //   intensity: undefined,
-        //   opacity: 0.8,
-        //   legendEnabled: false
-        // },
-        // {
-        //   id: 47,
-        //   title: 'Perceptions of whether marshes or mangroves are better vary by location',
-        //   visible: false,
-        //   intensity: undefined,
-        //   opacity: 0.8,
-        //   legendEnabled: false
-        // },
-        // {
-        //   id: 48,
-        //   title: 'Protecting the coast during storms',
-        //   visible: false,
-        //   intensity: undefined,
-        //   opacity: 0.8,
-        //   legendEnabled: false
-        // },
-        // {
-        //   id: 49,
-        //   title: 'Supporting Layers',
-        //   visible: false,
-        //   intensity: undefined,
-        //   opacity: 0.8,
-        //   legendEnabled: false
-        // },
-        // {
-        //   id: 50,
-        //   title: 'Tidal Wetland Complexes',
-        //   visible: false,
-        //   intensity: undefined,
-        //   opacity: 0.8
-        // },
-        // {
-        //   id: 51,
-        //   title: 'Inland Wetland Migration Space',
-        //   visible: false,
-        //   intensity: undefined,
-        //   opacity: 0.8
-        // },
-        {
-          id: 6,
-          title: 'Mangrove Presence (Recent Climate)',
-          visible: false,
-          intensity: 'Current',
-          opacity: 0.8
-        },
-        {
-          id: 7,
-          title: 'Mangrove Presence (Future Moderate Climate)',
-          visible: false,
-          intensity: 'Moderate',
-          opacity: 0.8
-        },
-        {
-          id: 8,
-          title: 'Mangrove Presence (Future Severe Climate)',
-          visible: false,
-          intensity: 'Intense',
-          opacity: 0.8
-        },
-        {
-          id: 9,
-          title: 'Mangrove Relative Abundance (Recent Climate)',
-          visible: false,
-          intensity: 'Current',
-          opacity: 0.8
-        },
-        {
-          id: 10,
-          title: 'Mangrove Relative Abundance (Future Moderate Climate)',
-          visible: false,
-          intensity: 'Moderate',
-          opacity: 0.8
-        },
-        {
-          id: 11,
-          title: 'Mangrove Relative Abundance (Future Severe Climate)',
-          visible: false,
-          intensity: 'Intense',
-          opacity: 0.8
-        },
-        {
-          id: 12,
-          title: 'Aboveground Biomass (Recent Climate)',
-          visible: false,
-          intensity: 'Current',
-          opacity: 0.8
-        },
-        {
-          id: 13,
-          title: 'Aboveground Biomass (Future Moderate Climate)',
-          visible: false,
-          intensity: 'Moderate',
-          opacity: 0.8
-        },
-        {
-          id: 14,
-          title: 'Aboveground Biomass (Future Severe Climate)',
-          visible: false,
-          intensity: 'Intense',
-          opacity: 0.8
-        },
-        {
-          id: 15,
-          title: 'Wetland Vegetation Height (Recent Climate)',
-          visible: false,
-          intensity: 'Current',
-          opacity: 0.8
-        },
-        {
-          id: 16,
-          title: 'Wetland Vegetation Height (Future Moderate Climate)',
-          visible: false,
-          intensity: 'Moderate',
-          opacity: 0.8
-        },
-        {
-          id: 17,
-          title: 'Wetland Vegetation Height (Future Severe Climate)',
-          visible: false,
-          intensity: 'Intense',
-          opacity: 0.8
-        }
+        { name: 'Providing nesting platforms for birds', source: 'vector', visible: false, opacity: 0.8 },
+        { name: 'Recovering from freeze events', source: 'vector', visible: false, opacity: 0.8 },
+        { name: 'Providing nectar flowers for honey production', source: 'vector', visible: false, opacity: 0.8 },
+        { name: 'Stabilizing sediments and jumpstarting coastal restoration efforts', source: 'vector', visible: false, opacity: 0.8 },
+        { name: 'Recovering from extreme flooding', source: 'vector', visible: false, opacity: 0.8 },
+        { name: 'Improving water quality', source: 'vector', visible: false, opacity: 0.8 },
+        { name: 'Recovery from hurricanes', source: 'vector', visible: false, opacity: 0.8 },
+        { name: 'Supporting coastal fisheries', source: 'vector', visible: false, opacity: 0.8 },
+        { name: 'Providing desirable views of the coast', source: 'vector', visible: false, opacity: 0.8 },
+        { name: 'Reducing wind speeds', source: 'vector', visible: false, opacity: 0.8 },
+        { name: 'Providing access to fishing areas', source: 'vector', visible: false, opacity: 0.8 },
+        { name: 'Responding to sea level rise', source: 'vector', visible: false, opacity: 0.8 },
+        { name: 'Preventing coastal erosion', source: 'vector', visible: false, opacity: 0.8 },
+        { name: 'Providing habitat for birds', source: 'vector', visible: false, opacity: 0.8 },
+        { name: 'Protecting the coast during storms', source: 'vector', visible: false, opacity: 0.8 },
+        { name: 'Tidal Wetland Complexes', source: 'vector', visible: false, opacity: 0.8 },
+        { name: 'Inland Wetland Migration Space', source: 'vector', visible: false, opacity: 0.8 }
       ]
-    })
-    esri.map.add(esri.mapImageLayer)
-  },
+    },
 
-  methods: {
-    updateSupportingVisibility() {
-      // turn off all raster layer visibility
-      esri.map.layers.items.forEach((fl) => {
-        if (fl.type === 'feature') {
-          if (fl.id == 30 || fl.id == 31) {
-            fl.visible = false
-          }
-        }
-        if (fl.type == 'map-image') {
-          fl.allSublayers.items.forEach((sl) => {
-            if (sl.layer.type == 'map-image') {
-              if (sl.id == 30 || sl.id == 31) {
-                sl.visible = false
-              }
-            }
+    async getServiceNameLookup(url) {
+      let response = await esriRequest(url + '?f=pjson', { responseType: 'json' })
+      let lookup = {}
+      response.data.layers.forEach((layer) => {
+        lookup[this.normalizeLayerName(layer.name)] = layer.id
+      })
+      return lookup
+    },
+
+    getManagedLayer(name) {
+      return esri.managedLayersByName[this.normalizeLayerName(name)]
+    },
+
+    async initializeManagedLayers() {
+      let vectorUrl = this.$store.state.config.services.vectorFeatureService
+      let rasterUrl = this.$store.state.config.services.rasterMapService
+      let [vectorLookup, rasterLookup] = await Promise.all([
+        this.getServiceNameLookup(vectorUrl),
+        this.getServiceNameLookup(rasterUrl)
+      ])
+
+      let configs = this.getManagedLayerConfigs()
+      let unmatched = configs.filter((config) => {
+        let lookup = config.source == 'vector' ? vectorLookup : rasterLookup
+        return lookup[this.normalizeLayerName(config.name)] === undefined
+      })
+      if (unmatched.length > 0) {
+        throw new Error('Unmatched layers: ' + unmatched.map((layer) => layer.name).join(', '))
+      }
+
+      let rasterSublayers = configs
+        .filter((config) => config.source == 'raster')
+        .map((config) => ({
+          id: rasterLookup[this.normalizeLayerName(config.name)],
+          title: config.name,
+          visible: config.visible,
+          opacity: config.opacity
+        }))
+
+      esri.mapImageLayer = new MapImageLayer({
+        url: rasterUrl,
+        title: 'Mangrove Explorer',
+        sublayers: rasterSublayers
+      })
+      esri.map.add(esri.mapImageLayer)
+
+      configs
+        .filter((config) => config.source == 'vector')
+        .forEach((config) => {
+          let layer = new FeatureLayer({
+            url: vectorUrl + '/' + vectorLookup[this.normalizeLayerName(config.name)],
+            title: config.name,
+            visible: config.visible,
+            opacity: config.opacity
           })
+          layer.intensity = config.intensity
+          layer.question = config.question
+          layer.supportingSelection = config.supportingSelection
+          esri.map.add(layer)
+          esri.managedLayersByName[this.normalizeLayerName(config.name)] = layer
+        })
+
+      await esri.mapImageLayer.when()
+      configs
+        .filter((config) => config.source == 'raster')
+        .forEach((config) => {
+          let sublayer = esri.mapImageLayer.findSublayerById(
+            rasterLookup[this.normalizeLayerName(config.name)]
+          )
+          sublayer.intensity = config.intensity
+          esri.managedLayersByName[this.normalizeLayerName(config.name)] = sublayer
+        })
+
+      esri.supportingLayerNames = this.$store.state.config.supportingSelectionLayerNames.map(
+        (name) => this.normalizeLayerName(name)
+      )
+      esri.climateLayerNames = configs
+        .filter((config) => config.source == 'raster')
+        .map((config) => this.normalizeLayerName(config.name))
+      esri.modelLayerNames = configs
+        .filter((config) => config.name.includes('(Recent Climate)') || config.name.includes('(Future'))
+        .filter((config) => config.name.includes('Mangrove') || config.name.includes('Biomass') || config.name.includes('Wetland Vegetation Height'))
+        .map((config) => this.normalizeLayerName(config.name))
+      esri.socialQuestionLayerNames = [
+        'Where are mangroves protected by state law?',
+        'What do people think is driving mangrove change in expansion areas?',
+        'What actions do people think need to be taken for mangroves in expansion areas?'
+      ].map((name) => this.normalizeLayerName(name))
+    },
+
+    updateSupportingVisibility() {
+      esri.supportingLayerNames.forEach((name) => {
+        let layer = this.getManagedLayer(name)
+        if (layer) {
+          layer.visible = false
         }
       })
-      // turn on all sublayers that are checked in the TOC
       this.supportingMapVisibleLayers.forEach((l) => {
-        //if type is raster layer - find the sublayer and make visible
-        if (l.type === 'Raster Layer') {
-          let layer = esri.map.layers.items.find((layer) => {
-            return (
-              layer.type == 'map-image' &&
-              layer.url ==
-                this.$store.state.config.supportingMapLayers[l.mapServiceIndex].mapService
-            )
-          })
-          let sublayer = layer.allSublayers.items.find((sublayer) => {
-            return sublayer.id == l.id
-          })
-          sublayer.visible = true
-        }
-        if (l.type === 'Feature Layer') {
-          //check to see if feature layer exists.  if it does make it visible, if not create it.
-          let i = esri.map.layers.items.findIndex(
-            (layer) =>
-              layer.layerId == l.id &&
-              layer.url ==
-                this.$store.state.config.supportingMapLayers[l.mapServiceIndex].mapService
-          )
-
-          if (i >= 0) {
-            console.log('finds feature layer')
-            esri.map.layers.items[i].visible = true
-          } else {
-            //check to see if fl has a popup template defined
-            console.log('creates feature layer')
-            let layerList =
-              this.$store.state.config.supportingMapLayers[l.mapServiceIndex].popupTemplate
-            let i = layerList.findIndex((layer) => layer.id == l.id)
-            if (i >= 0) {
-              let template = {
-                title: layerList[i].title,
-                content: [
-                  {
-                    type: 'text',
-                    text: layerList[i].label + ':  <b>{ ' + layerList[i].field + '}</b>'
-                  }
-                ]
-              }
-              //get index of map server
-              esri.map.add(
-                new FeatureLayer({
-                  url:
-                    this.$store.state.config.supportingMapLayers[l.mapServiceIndex].mapService +
-                    '/' +
-                    l.id,
-                  popupTemplate: template
-                })
-              )
-            }
-            //if no popup defined create the feature layer without popup
-            else {
-              esri.map.add(
-                new FeatureLayer({
-                  url:
-                    this.$store.state.config.supportingMapLayers[l.mapServiceIndex].mapService +
-                    '/' +
-                    l.id
-                })
-              )
-            }
-          }
+        let layer = this.getManagedLayer(l.layerName)
+        if (layer) {
+          layer.visible = true
         }
       })
     },
 
     updateSupportingOpacity() {
       let l = this.supportingVisibleLayerOpacity
-      // if it is a raster find the sublayer and set the opacity
-      if (l.type === 'Raster Layer') {
-        let layer = esri.map.layers.items.find((layer) => {
-          return (
-            layer.type == 'map-image' &&
-            layer.url == this.$store.state.config.supportingMapLayers[l.mapServiceIndex].mapService
-          )
-        })
-        let sublayer = layer.allSublayers.items.find((sublayer) => {
-          return sublayer.id == l.id
-        })
-        sublayer.opacity = l.value
-      }
-      //if it is a feature layers, create it if it does not exist but make visibility false.  then set its opacity so that
-      //when the user turns it on, it will find the layer and match the ui opacity dial.
-      if (l.type == 'Feature Layer') {
-        let i = esri.map.layers.items.findIndex(
-          (layer) =>
-            layer.layerId == l.id &&
-            layer.url == this.$store.state.config.supportingMapLayers[l.mapServiceIndex].mapService
-        )
-
-        if (i >= 0) {
-          console.log('finds feature layer')
-          esri.map.layers.items[i].opacity = l.value
-        } else {
-          //check to see if fl has a popup template defined
-          console.log('creates feature layer')
-          let layerList =
-            this.$store.state.config.supportingMapLayers[l.mapServiceIndex].popupTemplate
-          let i = layerList.findIndex((layer) => layer.id == l.id)
-          if (i >= 0) {
-            let template = {
-              title: layerList[i].title,
-              content: [
-                {
-                  type: 'text',
-                  text: layerList[i].label + ':  <b>{ ' + layerList[i].field + '}</b>'
-                }
-              ]
-            }
-            //get index of map server
-            esri.map.add(
-              new FeatureLayer({
-                url:
-                  this.$store.state.config.supportingMapLayers[l.mapServiceIndex].mapService +
-                  '/' +
-                  l.id,
-                popupTemplate: template,
-                visible: false,
-                opacity: l.value
-              })
-            )
-          }
-          //if no popup defined create the feature layer without popup
-          else {
-            esri.map.add(
-              new FeatureLayer({
-                url:
-                  this.$store.state.config.supportingMapLayers[l.mapServiceIndex].mapService +
-                  '/' +
-                  l.id,
-                visible: false,
-                opacity: l.value
-              })
-            )
-          }
-        }
+      let layer = this.getManagedLayer(l.layerName)
+      if (layer) {
+        layer.opacity = l.value
       }
     },
 
@@ -1135,7 +795,8 @@ export default {
     },
 
     changeMangroveLayers() {
-      esri.mapImageLayer.sublayers.forEach((layer) => {
+      Object.keys(esri.managedLayersByName).forEach((name) => {
+        let layer = esri.managedLayersByName[name]
         if (this.layerOption.includes(layer.title) == true) {
           layer.visible = true
         } else if (this.supportingOption.includes(layer.title)) {
@@ -1150,10 +811,11 @@ export default {
       let newLayerOption = []
       if (array !== []) {
         array.forEach((layerLabel) => {
-          esri.mapImageLayer.sublayers.forEach((layer) => {
+          Object.keys(esri.managedLayersByName).forEach((key) => {
+            let layer = esri.managedLayersByName[key]
             if (layerLabel == layer.title) {
               if (this.mangroveLayer == 'Current') {
-                let sl = esri.mapImageLayer.findSublayerById(parseInt(layer.supLayers.Current))
+                let sl = this.getManagedLayer(layer.supLayers.Current)
 
                 layer.visible = false
                 sl.visible = true
@@ -1161,7 +823,7 @@ export default {
                 newLayerOption.push(sl.title)
               }
               if (this.mangroveLayer == 'Moderate') {
-                let sl = esri.mapImageLayer.findSublayerById(parseInt(layer.supLayers.Moderate))
+                let sl = this.getManagedLayer(layer.supLayers.Moderate)
 
                 layer.visible = false
                 sl.visible = true
@@ -1169,7 +831,7 @@ export default {
                 newLayerOption.push(sl.title)
               }
               if (this.mangroveLayer == 'Intense') {
-                let sl = esri.mapImageLayer.findSublayerById(parseInt(layer.supLayers.Intense))
+                let sl = this.getManagedLayer(layer.supLayers.Intense)
 
                 layer.visible = false
                 sl.visible = true
@@ -1183,7 +845,8 @@ export default {
 
       if (supportArray !== []) {
         supportArray.forEach((layerLabel) => {
-          esri.mapImageLayer.sublayers.forEach((layer) => {
+          Object.keys(esri.managedLayersByName).forEach((key) => {
+            let layer = esri.managedLayersByName[key]
             if (layerLabel == layer.title) {
               layer.visible = true
             }
@@ -1196,14 +859,21 @@ export default {
 
     updateMangroveLayerVis(type, intensity) {
       if (this.previousMangroveLayer !== '') {
-        esri.mapImageLayer.findSublayerById(this.previousMangroveLayer).visible = false
+        let previousLayer = this.getManagedLayer(this.previousMangroveLayer)
+        if (previousLayer) {
+          previousLayer.visible = false
+        }
       }
 
-      esri.mapImageLayer.sublayers.forEach((layer) => {
-        if (layer.title) {
-          if (layer.title.includes(type) == true && layer.id !== 1) {
+      esri.modelLayerNames.forEach((name) => {
+        let layer = this.getManagedLayer(name)
+        if (layer && layer.title) {
+          if (
+            layer.title.includes(type) == true &&
+            layer.title !== 'Mangrove Presence and Absence (based on expert input 2023)'
+          ) {
             if (layer.intensity == intensity) {
-              this.previousMangroveLayer = layer.id
+              this.previousMangroveLayer = layer.title
               layer.visible = true
             } else {
               layer.visible = false
@@ -1214,20 +884,20 @@ export default {
     },
 
     updateSupportingLayerVis(array) {
-      esri.mapImageLayer.sublayers.forEach((layer) => {
-        if (layer.id == 1 || layer.id == 2 || layer.id == 3 || layer.id == 4) {
-          if (array.includes(layer.id) == true) {
-            layer.visible = true
-          } else {
-            layer.visible = false
-          }
+      esri.supportingLayerNames.forEach((name) => {
+        let layer = this.getManagedLayer(name)
+        if (layer) {
+          layer.visible = array.includes(layer.title) == true
         }
       })
     },
 
     updateClimaticLayerVis(title, intensity) {
       if (this.previousClimaticLayer !== '') {
-        esri.mapImageLayer.findSublayerById(this.previousClimaticLayer).visible = false
+        let previousLayer = this.getManagedLayer(this.previousClimaticLayer)
+        if (previousLayer) {
+          previousLayer.visible = false
+        }
       }
 
       if (intensity == 0) {
@@ -1238,11 +908,12 @@ export default {
         intensity = 'Intense'
       }
 
-      esri.mapImageLayer.sublayers.forEach((layer) => {
-        if (layer.title) {
+      esri.climateLayerNames.forEach((name) => {
+        let layer = this.getManagedLayer(name)
+        if (layer && layer.title) {
           if (layer.title.includes(title) == true) {
             if (layer.intensity == intensity) {
-              this.previousClimaticLayer = layer.id
+              this.previousClimaticLayer = layer.title
               layer.visible = true
             } else {
               layer.visible = false
@@ -1256,50 +927,39 @@ export default {
       // title ==
       //     'How do people in mangrove expansion areas perceive the benefits provided by marshes versus mangroves?'
 
-      if (this.lastSocial !== '') {
-        esri.mapImageLayer.findSublayerById(this.lastSocial).visible = false
-      }
+      esri.socialQuestionLayerNames.forEach((name) => {
+        let layer = this.getManagedLayer(name)
+        if (layer) {
+          layer.visible = false
+        }
+      })
+      this.lastSocial = ''
 
       if (title == '' || title == undefined) {
         this.zoomToLayer()
       } else {
-        esri.mapImageLayer.sublayers.forEach((layer) => {
-          if (layer.question && layer.question == title) {
-            if (title == 'Where are mangroves protected by state law?') {
-              layer.visible = true
-              this.lastSocial = layer.id
-              this.zoomToLayer()
-            } else if (
-              title == 'What do people think is driving mangrove change in expansion areas?'
-            ) {
-              this.zoomToSocial()
-              if (layer.question == title) {
-                layer.visible = true
-                this.lastSocial = layer.id
-              }
-            } else if (
-              title ==
-              'What actions do people think need to be taken for mangroves in expansion areas?'
-            ) {
-              this.zoomToSocial()
-              if (layer.question == title) {
-                layer.visible = true
-                this.lastSocial = layer.id
-              }
-            } else if (
-              title ==
-              'What do people think about the benefits provided by mangroves versus marshes?'
-            ) {
-              this.zoomToSocial()
-              if (layer.question == title) {
-                layer.visible = true
-                this.lastSocial = layer.id
-              }
-            }
-          } else if (layer.question && layer.question !== title) {
-            layer.visible = false
+        if (title == 'Where are mangroves protected by state law?') {
+          let layer = this.getManagedLayer(title)
+          if (layer) {
+            layer.visible = true
+            this.lastSocial = layer.title
           }
-        })
+          this.zoomToLayer()
+        } else if (
+          title == 'What do people think is driving mangrove change in expansion areas?' ||
+          title == 'What actions do people think need to be taken for mangroves in expansion areas?'
+        ) {
+          let layer = this.getManagedLayer(title)
+          if (layer) {
+            layer.visible = true
+            this.lastSocial = layer.title
+          }
+          this.zoomToSocial()
+        } else if (
+          title == 'What do people think about the benefits provided by mangroves versus marshes?'
+        ) {
+          this.zoomToSocial()
+        }
       }
     },
 
@@ -1329,10 +989,18 @@ export default {
         view.goTo(combinedExtent)
       }
 
-      let percepMang = [31, 32, 33, 34, 35, 36]
-      let percepMarsh = [38, 39, 40, 41, 42, 43]
-      let percepMixed = [45, 46]
-      let percepVary = [48]
+      let percepMang = this.$store.state.config.subSocialLayerNameGroups.mangroveBetter
+      let percepMarsh = this.$store.state.config.subSocialLayerNameGroups.marshBetter
+      let percepMixed = this.$store.state.config.subSocialLayerNameGroups.mixed
+      let percepVary = this.$store.state.config.subSocialLayerNameGroups.varyByLocation
+      let setVisible = (names, visible) => {
+        names.forEach((name) => {
+          let layer = this.getManagedLayer(name)
+          if (layer) {
+            layer.visible = visible
+          }
+        })
+      }
 
       if (question !== undefined) {
         esri.lgExpand.collapse()
@@ -1348,66 +1016,34 @@ export default {
         // Insert queries for these layers
         // for feature layer queries, use dynamic solution. esri.socialContent = esri.findsublayerbyid(questionSublayerID) & esri.socialContent.queryFeatures
         if (question == 'Perceptions are consistent that mangroves are better') {
-          percepMang.forEach((layer) => {
-            esri.mapImageLayer.findSublayerById(layer).visible = true
-          })
-          percepMarsh.forEach((layer) => {
-            esri.mapImageLayer.findSublayerById(layer).visible = false
-          })
-          percepMixed.forEach((layer) => {
-            esri.mapImageLayer.findSublayerById(layer).visible = false
-          })
-          percepVary.forEach((layer) => {
-            esri.mapImageLayer.findSublayerById(layer).visible = false
-          })
+          setVisible(percepMang, true)
+          setVisible(percepMarsh, false)
+          setVisible(percepMixed, false)
+          setVisible(percepVary, false)
 
           // featureLayer.queryFeatures(query).then(function (results) {
           //   const features = results.features
           //   zoomToFeaturesExtent(features)
           // })
         } else if (question == 'Perceptions are consistent that marshes are better') {
-          percepMarsh.forEach((layer) => {
-            esri.mapImageLayer.findSublayerById(layer).visible = true
-          })
-          percepMang.forEach((layer) => {
-            esri.mapImageLayer.findSublayerById(layer).visible = false
-          })
-          percepMixed.forEach((layer) => {
-            esri.mapImageLayer.findSublayerById(layer).visible = false
-          })
-          percepVary.forEach((layer) => {
-            esri.mapImageLayer.findSublayerById(layer).visible = false
-          })
+          setVisible(percepMarsh, true)
+          setVisible(percepMang, false)
+          setVisible(percepMixed, false)
+          setVisible(percepVary, false)
         } else if (
           question == 'Perceptions of whether marshes or mangroves are better is consistently mixed'
         ) {
-          percepMixed.forEach((layer) => {
-            esri.mapImageLayer.findSublayerById(layer).visible = true
-          })
-          percepMang.forEach((layer) => {
-            esri.mapImageLayer.findSublayerById(layer).visible = false
-          })
-          percepMarsh.forEach((layer) => {
-            esri.mapImageLayer.findSublayerById(layer).visible = false
-          })
-          percepVary.forEach((layer) => {
-            esri.mapImageLayer.findSublayerById(layer).visible = false
-          })
+          setVisible(percepMixed, true)
+          setVisible(percepMang, false)
+          setVisible(percepMarsh, false)
+          setVisible(percepVary, false)
         } else if (
           question == 'Perceptions of whether marshes or mangroves are better vary by location'
         ) {
-          percepVary.forEach((layer) => {
-            esri.mapImageLayer.findSublayerById(layer).visible = true
-          })
-          percepMang.forEach((layer) => {
-            esri.mapImageLayer.findSublayerById(layer).visible = false
-          })
-          percepMarsh.forEach((layer) => {
-            esri.mapImageLayer.findSublayerById(layer).visible = false
-          })
-          percepMixed.forEach((layer) => {
-            esri.mapImageLayer.findSublayerById(layer).visible = false
-          })
+          setVisible(percepVary, true)
+          setVisible(percepMang, false)
+          setVisible(percepMarsh, false)
+          setVisible(percepMixed, false)
         }
       } else if (question == undefined || question == '') {
         this.subLegendInfo = false
@@ -1416,18 +1052,10 @@ export default {
         esri.socialExpand.visible = false
         esri.socialExpand.collapse()
 
-        percepMang.forEach((layer) => {
-          esri.mapImageLayer.findSublayerById(layer).visible = false
-        })
-        percepMarsh.forEach((layer) => {
-          esri.mapImageLayer.findSublayerById(layer).visible = false
-        })
-        percepMixed.forEach((layer) => {
-          esri.mapImageLayer.findSublayerById(layer).visible = false
-        })
-        percepVary.forEach((layer) => {
-          esri.mapImageLayer.findSublayerById(layer).visible = false
-        })
+        setVisible(percepMang, false)
+        setVisible(percepMarsh, false)
+        setVisible(percepMixed, false)
+        setVisible(percepVary, false)
 
         esri.mapView.goTo({
           center: [-88.900345, 29.222555],
@@ -1446,16 +1074,38 @@ export default {
       }
     },
 
+    formatLayerDescription(description) {
+      let formatted = description || ''
+      formatted = formatted
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/STYLE="text-align:Left;font-size:12pt"/g, '')
+      formatted = formatted.replace(
+        /\(\s*Source:\s*(https?:\/\/[^\s)]+)\s*\)\.?/gi,
+        '(<a href="$1" target="_blank">source</a>).'
+      )
+      formatted = formatted.replace(
+        /(^|[\s>])Source:\s*(https?:\/\/[^\s<)]+)\.?/gi,
+        '$1<a href="$2" target="_blank">source</a>.'
+      )
+      return formatted
+    },
+
     getDescriptions() {
       let obj = []
       let layDesc = []
+      let allowedDescriptionNames = this.getManagedLayerConfigs().map((layer) =>
+        this.normalizeLayerName(layer.name)
+      )
       // let suppOp = []
       let smnum = this.$store.state.config.forLayerDescriptions.length
       let smcount = 0
       this.$store.state.config.forLayerDescriptions.forEach((service, index) => {
         esriRequest(service.mapService + '/layers?f=pjson', {
           responseType: 'json'
-        }).then(function (response) {
+        }).then((response) => {
           let layerJson = response.data.layers
           //push main header to the object
 
@@ -1468,13 +1118,12 @@ export default {
           })
 
           let storeNodes = []
-          let type = ''
           layerJson.forEach((l) => {
-            service.popupTemplate.forEach((popup) => {
-              if (l.id == popup.id) {
-                type = 'Featue Layer'
-              } else type = 'Raster Layer'
-            })
+            let type = l.type == 'Feature Layer' ? 'Feature Layer' : 'Raster Layer'
+            let normalizedName = this.normalizeLayerName(l.name)
+            if (allowedDescriptionNames.includes(normalizedName) == false) {
+              return
+            }
             // add layer to layer viewer if it's id is not present in the skip array
             if (service.skipLayers.indexOf(l.id) == -1) {
               // Group Layer with no parent
@@ -1482,7 +1131,7 @@ export default {
                 //push the object to the list as child of main header
 
                 obj[index].children.push({
-                  label: l.name,
+                  label: normalizedName,
                   children: [],
                   id: l.id + '_' + index,
                   noTick: true,
@@ -1498,11 +1147,7 @@ export default {
                   parentIndex: parentIndex,
                   parentLoc: obj[index].children[parentIndex],
                   parentId: l.id + '_' + index,
-                  description: l.description
-                    .replace('&lt;/a&gt;', '</a>')
-                    .replace('&lt;a', '<a')
-                    .replace('&lt;', '<')
-                    .replace('&gt;', '>')
+                  description: this.formatLayerDescription(l.description)
                 })
               }
               // featurel layer with parent
@@ -1511,46 +1156,24 @@ export default {
                 let nodesIndex = storeNodes.findIndex(
                   (obj) => obj.parentId == l.parentLayer.id + '_' + index
                 )
-                //set the location of the parent
-                let parentLoc = storeNodes[nodesIndex].parentLoc
-                //push the child to the parent
-
-                // if (l.id == 1 || l.id == 2 || l.id == 3) {
-                // suppOp.push({
-                //   id: l.id,
-                //   title: l.name,
-                //   showDesc: false,
-                //   description: l.description
-                //     .replace('&lt;/a&gt;', '</a>')
-                //     .replace('&lt;a', '<a')
-                //     .replace('&lt;', '<')
-                //     .replace('&gt;', '>')
-                //     .replace('STYLE="text-align:Left;font-size:12pt"', '')
-                // })
-                // }
-
-                parentLoc.children.push({
-                  label: l.name,
-                  children: [],
-                  body: 'toggle',
-                  id: l.id + '_' + index,
-                  description: l.description
-                    .replace('&lt;/a&gt;', '</a>')
-                    .replace('&lt;a', '<a')
-                    .replace('&lt;', '<')
-                    .replace('&gt;', '>'),
-                  type: type
-                })
+                if (nodesIndex >= 0) {
+                  //set the location of the parent
+                  let parentLoc = storeNodes[nodesIndex].parentLoc
+                  //push the child to the parent
+                  parentLoc.children.push({
+                    label: normalizedName,
+                    children: [],
+                    body: 'toggle',
+                    id: l.id + '_' + index,
+                    description: this.formatLayerDescription(l.description),
+                    type: type
+                  })
+                }
 
                 layDesc.push({
                   id: l.id,
-                  title: l.name,
-                  description: l.description
-                    .replace('&lt;/a&gt;', '</a>')
-                    .replace('&lt;a', '<a')
-                    .replace('&lt;', '<')
-                    .replace('&gt;', '>')
-                    .replace('STYLE="text-align:Left;font-size:12pt"', '')
+                  title: normalizedName,
+                  description: this.formatLayerDescription(l.description)
                 })
               }
               // group layer with parent
@@ -1564,7 +1187,7 @@ export default {
                 //push the new parent into the found parent as child
 
                 parentLoc.children.push({
-                  label: l.name,
+                  label: normalizedName,
                   children: [],
                   id: l.id + '_' + index,
                   noTick: true,
@@ -1582,36 +1205,33 @@ export default {
                   parentIndex: parentIndex,
                   parentLoc: parentLoc,
                   parentId: l.id + '_' + index,
-                  description: l.description
-                    .replace('&lt;/a&gt;', '</a>')
-                    .replace('&lt;a', '<a')
-                    .replace('&lt;', '<')
-                    .replace('&gt;', '>')
+                  description: this.formatLayerDescription(l.description)
                 })
               }
               // feature layer with no parent length = number of nodes
               if (l.type !== 'Group Layer' && !l.parentLayer) {
                 obj[index].children.push({
-                  label: l.name,
+                  label: normalizedName,
                   children: [],
                   body: 'toggle',
                   id: l.id + '_' + index,
-                  description: l.description
-                    .replace('&lt;/a&gt;', '</a>')
-                    .replace('&lt;a', '<a')
-                    .replace('&lt;', '<')
-                    .replace('&gt;', '>'),
+                  description: this.formatLayerDescription(l.description),
                   type: type
+                })
+                layDesc.push({
+                  id: l.id,
+                  title: normalizedName,
+                  description: this.formatLayerDescription(l.description)
                 })
               }
             }
           })
           smcount = smcount + 1
-          // console.log(smcount)
-          // console.log(smnum)
+          if (smcount == smnum) {
+            this.layerDescriptions = layDesc
+          }
         })
       })
-      this.layerDescriptions = layDesc
 
       // this.supportingOptions = suppOp
     }
